@@ -1,5 +1,7 @@
 const Company = require('../models/Company');
 const User = require('../models/User');
+const Job = require('../models/Job');
+const Application = require('../models/Application');
 
 // @desc    Get all approved companies (public)
 // @route   GET /api/companies
@@ -233,5 +235,95 @@ exports.deleteCompany = async (req, res) => {
       message: 'حدث خطأ',
       error: error.message
     });
+  }
+};
+
+// @desc    Get dashboard charts data
+// @route   GET /api/companies/charts
+// @access  Private (Company)
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const company = await Company.findOne({ ownerId: req.user.id });
+    if (!company) {
+      return res.status(404).json({ success: false, message: 'الشركة غير موجودة' });
+    }
+
+    // 1. Applications over last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const companyJobs = await Job.find({ companyId: company._id }).select('_id title applicationCount status');
+    const jobIds = companyJobs.map(j => j._id);
+
+    const dailyApps = await Application.aggregate([
+      { $match: { jobId: { $in: jobIds }, createdAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const applicationsOverTime = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      const dateStr = d.toISOString().split('T')[0];
+      const found = dailyApps.find(a => a._id === dateStr);
+      applicationsOverTime.push({
+        name: dayNames[d.getDay()],
+        value: found ? found.count : 0
+      });
+    }
+
+    // 2. Jobs by status
+    const statusMap = { APPROVED: 'معتمدة', PENDING: 'معلقة', REJECTED: 'مرفوضة', CLOSED: 'مغلقة' };
+    const jobsByStatusRaw = {};
+    companyJobs.forEach(j => {
+      jobsByStatusRaw[j.status] = (jobsByStatusRaw[j.status] || 0) + 1;
+    });
+    const jobsByStatus = Object.entries(jobsByStatusRaw).map(([key, val]) => ({
+      name: statusMap[key] || key,
+      value: val
+    }));
+
+    // 3. Top jobs by application count
+    const topJobs = companyJobs
+      .sort((a, b) => (b.applicationCount || 0) - (a.applicationCount || 0))
+      .slice(0, 5)
+      .map(j => ({ name: j.title.substring(0, 20), value: j.applicationCount || 0 }));
+
+    // 4. Applications by status
+    const appStatusMap = {
+      PENDING: 'معلقة',
+      REVIEWING: 'تمت المراجعة',
+      ACCEPTED: 'مقبولة',
+      REJECTED: 'مرفوضة'
+    };
+    const appsByStatus = await Application.aggregate([
+      { $match: { jobId: { $in: jobIds } } },
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    const applicationsByStatus = appsByStatus.map(a => ({
+      name: appStatusMap[a._id] || a._id,
+      value: a.count
+    }));
+
+    res.json({
+      success: true,
+      charts: {
+        applicationsOverTime,
+        jobsByStatus,
+        topJobs,
+        applicationsByStatus
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ success: false, message: 'حدث خطأ', error: error.message });
   }
 };

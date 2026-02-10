@@ -45,6 +45,9 @@ export const authAPI = {
     updateProfile: (data: any) => api.put('/auth/profile', data),
     changePassword: (data: { currentPassword: string; newPassword: string }) =>
         api.put('/auth/password', data),
+    forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
+    resetPassword: (token: string, password: string) =>
+        api.put(`/auth/reset-password/${token}`, { password }),
 };
 
 // Jobs API
@@ -65,6 +68,7 @@ export const companiesAPI = {
     getOne: (id: string) => api.get(`/companies/${id}`),
     getMyCompany: () => api.get('/companies/me'),
     updateMyCompany: (data: any) => api.put('/companies/me', data),
+    getCharts: () => api.get('/companies/charts'),
     getAllAdmin: (params?: any) => api.get('/companies/admin/all', { params }),
     updateStatus: (id: string, status: string) => api.put(`/companies/${id}/status`, { status }),
     delete: (id: string) => api.delete(`/companies/${id}`),
@@ -99,6 +103,23 @@ export const uploadAPI = {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
     },
+};
+
+// Reviews API
+export const reviewsAPI = {
+    getCompanyReviews: (companyId: string, params?: any) =>
+        api.get(`/reviews/company/${companyId}`, { params }),
+    createReview: (data: {
+        companyId: string;
+        rating: number;
+        title: string;
+        comment: string;
+        pros?: string;
+        cons?: string;
+        isAnonymous?: boolean;
+    }) => api.post('/reviews', data),
+    updateReview: (id: string, data: any) => api.put(`/reviews/${id}`, data),
+    deleteReview: (id: string) => api.delete(`/reviews/${id}`),
 };
 
 export default api;

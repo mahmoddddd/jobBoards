@@ -7,7 +7,8 @@ const {
   updateMyCompany,
   getAllCompaniesAdmin,
   updateCompanyStatus,
-  deleteCompany
+  deleteCompany,
+  getDashboardStats
 } = require('../controllers/companyController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -17,6 +18,7 @@ router.get('/', getCompanies);
 // Company routes (MUST be before /:id to prevent 'me' being matched as an ID)
 router.get('/me', protect, authorize('COMPANY'), getMyCompany);
 router.put('/me', protect, authorize('COMPANY'), updateMyCompany);
+router.get('/charts', protect, authorize('COMPANY'), getDashboardStats);
 
 // Admin routes (MUST be before /:id to prevent 'admin' being matched as an ID)
 router.get('/admin/all', protect, authorize('ADMIN'), getAllCompaniesAdmin);

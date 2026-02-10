@@ -17,6 +17,7 @@ import {
     ExternalLink
 } from 'lucide-react';
 import api from '@/lib/api';
+import CompanyReviews from '@/components/CompanyReviews';
 
 interface Company {
     _id: string;
@@ -50,6 +51,7 @@ export default function CompanyPage() {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [activeTab, setActiveTab] = useState<'about' | 'jobs' | 'reviews'>('about');
 
     useEffect(() => {
         fetchCompanyData();
@@ -114,41 +116,44 @@ export default function CompanyPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             {/* Hero */}
-            <div className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">
-                <div className="container mx-auto px-4">
-                    <Link href="/jobs" className="text-white/80 hover:text-white flex items-center gap-1 mb-6">
+            <div className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-hero-pattern opacity-10"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                    <Link href="/companies" className="text-white/80 hover:text-white flex items-center gap-1 mb-8 w-fit transition-colors">
                         <ArrowRight className="w-4 h-4" />
-                        العودة للوظائف
+                        العودة للشركات
                     </Link>
 
-                    <div className="flex items-center gap-6">
-                        <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center text-white border border-white/20">
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-white p-2 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
                             {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="w-full h-full object-cover rounded-2xl" />
+                                <img src={company.logo} alt={company.name} className="w-full h-full object-contain rounded-2xl" />
                             ) : (
-                                <span className="text-4xl font-bold">{company.name.charAt(0)}</span>
+                                <div className="w-full h-full bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-6xl font-bold">
+                                    {company.name.charAt(0)}
+                                </div>
                             )}
                         </div>
-                        <div>
-                            <h1 className="text-4xl font-bold mb-2">{company.name}</h1>
-                            <div className="flex flex-wrap gap-4 text-white/80">
+                        <div className="text-center md:text-right flex-1">
+                            <h1 className="text-4xl md:text-5xl font-bold mb-4">{company.name}</h1>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-6 text-white/90">
                                 {company.industry && (
-                                    <span className="flex items-center gap-1">
-                                        <Building2 className="w-4 h-4" />
+                                    <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                                        <Building2 className="w-5 h-5" />
                                         {company.industry}
                                     </span>
                                 )}
                                 {company.location && (
-                                    <span className="flex items-center gap-1">
-                                        <MapPin className="w-4 h-4" />
+                                    <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                                        <MapPin className="w-5 h-5" />
                                         {company.location}
                                     </span>
                                 )}
                                 {company.size && (
-                                    <span className="flex items-center gap-1">
-                                        <Users className="w-4 h-4" />
+                                    <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                                        <Users className="w-5 h-5" />
                                         {company.size} موظف
                                     </span>
                                 )}
@@ -161,117 +166,153 @@ export default function CompanyPage() {
             <div className="container mx-auto px-4 py-8">
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Main Content */}
-                    <div className="lg:col-span-2">
-                        {/* About */}
-                        <div className="card p-6 mb-8">
-                            <h2 className="text-xl font-bold mb-4">عن الشركة</h2>
-                            <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-                                {company.description}
-                            </p>
+                    <div className="lg:col-span-2 space-y-8">
+
+                        {/* Tabs */}
+                        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+                            <button
+                                onClick={() => setActiveTab('about')}
+                                className={`px-6 py-3 font-medium transition-all relative ${activeTab === 'about'
+                                    ? 'text-primary-600 dark:text-primary-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                            >
+                                عن الشركة
+                                {activeTab === 'about' && <span className="absolute bottom-0 right-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-t-full"></span>}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('jobs')}
+                                className={`px-6 py-3 font-medium transition-all relative ${activeTab === 'jobs'
+                                    ? 'text-primary-600 dark:text-primary-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                            >
+                                الوظائف المتاحة
+                                <span className="mr-2 badge-gray text-xs px-2 py-0.5 rounded-full">{jobs.length}</span>
+                                {activeTab === 'jobs' && <span className="absolute bottom-0 right-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-t-full"></span>}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('reviews')}
+                                className={`px-6 py-3 font-medium transition-all relative ${activeTab === 'reviews'
+                                    ? 'text-primary-600 dark:text-primary-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                            >
+                                التقييمات
+                                {activeTab === 'reviews' && <span className="absolute bottom-0 right-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400 rounded-t-full"></span>}
+                            </button>
                         </div>
 
-                        {/* Open Positions */}
-                        <div className="card p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold">الوظائف المتاحة</h2>
-                                <span className="badge badge-primary">{jobs.length} وظيفة</span>
-                            </div>
-
-                            {jobs.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                                    <p className="text-gray-500">لا توجد وظائف متاحة حالياً</p>
+                        {/* Tab Content */}
+                        <div className="animate-fade-in">
+                            {activeTab === 'about' && (
+                                <div className="card p-8">
+                                    <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">نبذة عن الشركة</h2>
+                                    <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed text-lg">
+                                        {company.description}
+                                    </p>
                                 </div>
-                            ) : (
+                            )}
+
+                            {activeTab === 'jobs' && (
                                 <div className="space-y-4">
-                                    {jobs.map((job) => (
-                                        <Link
-                                            key={job._id}
-                                            href={`/jobs/${job._id}`}
-                                            className="block p-4 rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition group"
-                                        >
-                                            <div className="flex justify-between items-start">
+                                    {jobs.length === 0 ? (
+                                        <div className="card p-12 text-center">
+                                            <Briefcase className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">لا توجد وظائف متاحة</h3>
+                                            <p className="text-gray-500 dark:text-gray-400">تابع الشركة لتصلك إشعارات بالوظائف الجديدة</p>
+                                        </div>
+                                    ) : (
+                                        jobs.map((job) => (
+                                            <Link
+                                                key={job._id}
+                                                href={`/jobs/${job._id}`}
+                                                className="card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-primary-500 dark:hover:border-primary-400 transition group"
+                                            >
                                                 <div>
-                                                    <h3 className="font-semibold text-lg group-hover:text-primary-600 transition">
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors mb-2">
                                                         {job.title}
                                                     </h3>
-                                                    <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
-                                                        <span className="flex items-center gap-1">
+                                                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                                        <span className="flex items-center gap-1.5">
                                                             <MapPin className="w-4 h-4" />
                                                             {job.location}
                                                         </span>
-                                                        <span className="flex items-center gap-1">
+                                                        <span className="flex items-center gap-1.5">
                                                             <Briefcase className="w-4 h-4" />
                                                             {getJobTypeLabel(job.jobType)}
                                                         </span>
-                                                        <span className="flex items-center gap-1">
+                                                        <span className="flex items-center gap-1.5">
                                                             <Clock className="w-4 h-4" />
                                                             {getExperienceLabel(job.experienceLevel)}
                                                         </span>
                                                     </div>
-                                                    {job.salaryMin && job.salaryMax && (
-                                                        <p className="text-primary-600 font-semibold mt-2">
-                                                            {job.salaryMin.toLocaleString()} - {job.salaryMax.toLocaleString()} ج.م
-                                                        </p>
-                                                    )}
                                                 </div>
-                                                <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition" />
-                                            </div>
-                                        </Link>
-                                    ))}
+                                                <div className="flex items-center md:flex-col gap-4 md:items-end">
+                                                    {job.salaryMin && job.salaryMax && (
+                                                        <span className="badge-green font-bold text-lg">
+                                                            {job.salaryMin.toLocaleString()} - {job.salaryMax.toLocaleString()} ج.م
+                                                        </span>
+                                                    )}
+                                                    <span className="text-xs text-gray-400">
+                                                        منذ {new Date(job.createdAt).toLocaleDateString('ar-EG')}
+                                                    </span>
+                                                </div>
+                                            </Link>
+                                        ))
+                                    )}
                                 </div>
+                            )}
+
+                            {activeTab === 'reviews' && (
+                                <CompanyReviews companyId={companyId} />
                             )}
                         </div>
                     </div>
 
                     {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="card p-6 sticky top-4">
-                            <h3 className="font-bold mb-4">معلومات التواصل</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3 text-gray-600">
-                                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                        <Mail className="w-5 h-5 text-gray-600" />
+                    <div className="lg:col-span-1 space-y-6">
+                        <div className="card p-6 sticky top-24">
+                            <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-6 border-b dark:border-gray-700 pb-3">
+                                معلومات التواصل
+                            </h3>
+                            <div className="space-y-6">
+                                <a href={`mailto:${company.email}`} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-750 transition group">
+                                    <div className="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform">
+                                        <Mail className="w-5 h-5" />
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500">البريد الإلكتروني</p>
-                                        <a href={`mailto:${company.email}`} className="hover:text-primary-600">
-                                            {company.email}
-                                        </a>
+                                    <div className="flex-1 overflow-hidden">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">البريد الإلكتروني</p>
+                                        <p className="font-medium text-gray-900 dark:text-white truncate" title={company.email}>{company.email}</p>
                                     </div>
-                                </div>
+                                </a>
 
                                 {company.phone && (
-                                    <div className="flex items-center gap-3 text-gray-600">
-                                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                            <Phone className="w-5 h-5 text-gray-600" />
+                                    <a href={`tel:${company.phone}`} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-750 transition group">
+                                        <div className="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform">
+                                            <Phone className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500">الهاتف</p>
-                                            <a href={`tel:${company.phone}`} className="hover:text-primary-600">
-                                                {company.phone}
-                                            </a>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">الهاتف</p>
+                                            <p className="font-medium text-gray-900 dark:text-white" dir="ltr">{company.phone}</p>
                                         </div>
-                                    </div>
+                                    </a>
                                 )}
 
                                 {company.website && (
-                                    <div className="flex items-center gap-3 text-gray-600">
-                                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                            <Globe className="w-5 h-5 text-gray-600" />
+                                    <a
+                                        href={company.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-750 transition group"
+                                    >
+                                        <div className="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform">
+                                            <Globe className="w-5 h-5" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm text-gray-500">الموقع الإلكتروني</p>
-                                            <a
-                                                href={company.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="hover:text-primary-600"
-                                            >
-                                                زيارة الموقع
-                                            </a>
+                                        <div className="flex-1 overflow-hidden">
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">الموقع الإلكتروني</p>
+                                            <p className="font-medium text-primary-600 dark:text-primary-400 truncate flex items-center gap-1">
+                                                زيارة الموقع <ExternalLink className="w-3 h-3" />
+                                            </p>
                                         </div>
-                                    </div>
+                                    </a>
                                 )}
                             </div>
                         </div>

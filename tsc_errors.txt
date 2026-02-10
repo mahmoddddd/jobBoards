@@ -1,0 +1,2 @@
+﻿app/profile/page.tsx(74,29): error TS2339: Property 'phone' does not exist on type 'User'.
+components/charts/StatsCharts.tsx(91,71): error TS18048: 'percent' is possibly 'undefined'.

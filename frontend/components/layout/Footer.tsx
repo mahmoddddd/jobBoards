@@ -5,7 +5,7 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gray-900 text-gray-300">
+        <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300">
             <div className="container mx-auto px-4 py-12">
                 <div className="grid md:grid-cols-4 gap-8">
                     {/* Brand */}
@@ -45,18 +45,18 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
+                                <Link href="/companies" className="text-gray-400 hover:text-primary-400 transition">
+                                    الشركات
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/register" className="text-gray-400 hover:text-primary-400 transition">
                                     إنشاء حساب
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/login" className="text-gray-400 hover:text-primary-400 transition">
-                                    تسجيل الدخول
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/register?type=company" className="text-gray-400 hover:text-primary-400 transition">
-                                    للشركات
+                                <Link href="/resume-builder" className="text-gray-400 hover:text-primary-400 transition">
+                                    بناء السيرة الذاتية
                                 </Link>
                             </li>
                         </ul>

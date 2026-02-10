@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Company = require('../models/Company');
+const crypto = require('crypto');
+const { sendEmail, getPasswordResetEmail } = require('../config/email');
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -199,6 +201,114 @@ exports.changePassword = async (req, res) => {
       message: 'تم تغيير كلمة المرور'
     });
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Forgot password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'لا يوجد حساب مرتبط بهذا الإيميل'
+      });
+    }
+
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'إعادة تعيين كلمة المرور - JobBoard',
+        html: getPasswordResetEmail(user.name, resetUrl),
+      });
+
+      res.json({
+        success: true,
+        message: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'
+      });
+    } catch (emailError) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      console.error('Email send error:', emailError);
+      return res.status(500).json({
+        success: false,
+        message: 'حدث خطأ في إرسال البريد الإلكتروني'
+      });
+    }
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Reset password
+// @route   PUT /api/auth/reset-password/:token
+// @access  Public
+exports.resetPassword = async (req, res) => {
+  try {
+    // Get hashed token
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'رابط إعادة التعيين غير صالح أو منتهي الصلاحية'
+      });
+    }
+
+    // Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    // Generate token for auto-login
+    const token = user.generateToken();
+
+    res.json({
+      success: true,
+      message: 'تم إعادة تعيين كلمة المرور بنجاح',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId
+      }
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
     res.status(500).json({
       success: false,
       message: 'حدث خطأ',

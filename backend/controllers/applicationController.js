@@ -1,6 +1,10 @@
 const Application = require('../models/Application');
 const Job = require('../models/Job');
 const Company = require('../models/Company');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
+const { sendEmail, getApplicationStatusEmail } = require('../config/email');
+const { sendToUser } = require('../config/socket');
 
 // @desc    Apply to job
 // @route   POST /api/applications
@@ -45,6 +49,29 @@ exports.applyToJob = async (req, res) => {
       cvPublicId,
       coverLetter
     });
+
+    // Notify company owner about new application
+    try {
+      const company = await Company.findById(job.companyId);
+      if (company) {
+        const notification = await Notification.create({
+          userId: company.ownerId,
+          type: 'APPLICATION_RECEIVED',
+          title: 'طلب توظيف جديد',
+          message: `تم استلام طلب جديد على وظيفة "${job.title}"`,
+          link: `/company/applicants/${job._id}`
+        });
+        sendToUser(company.ownerId.toString(), 'notification', notification);
+        // Real-time dashboard update
+        sendToUser(company.ownerId.toString(), 'new-application', {
+          applicantName: req.user.name,
+          jobTitle: job.title,
+          jobId: job._id
+        });
+      }
+    } catch (notifError) {
+      console.error('Notification error:', notifError);
+    }
 
     res.status(201).json({
       success: true,
@@ -181,6 +208,37 @@ exports.updateApplicationStatus = async (req, res) => {
     application.status = status;
     if (notes) application.notes = notes;
     await application.save();
+
+    // Send email + socket notification to applicant
+    try {
+      const applicant = await User.findById(application.userId);
+      if (applicant) {
+        // Create in-app notification
+        const notification = await Notification.create({
+          userId: applicant._id,
+          type: 'APPLICATION_STATUS',
+          title: 'تحديث حالة طلبك',
+          message: `تم تحديث حالة طلبك لوظيفة "${application.jobId.title}"`,
+          link: `/applications`
+        });
+        sendToUser(applicant._id.toString(), 'notification', notification);
+
+        // Send email notification
+        const emailHtml = getApplicationStatusEmail(
+          applicant.name,
+          application.jobId.title,
+          company.name,
+          status
+        );
+        sendEmail({
+          to: applicant.email,
+          subject: `تحديث حالة طلبك - ${application.jobId.title}`,
+          html: emailHtml
+        }).catch(err => console.error('Email error:', err));
+      }
+    } catch (notifError) {
+      console.error('Notification error:', notifError);
+    }
 
     res.json({
       success: true,
