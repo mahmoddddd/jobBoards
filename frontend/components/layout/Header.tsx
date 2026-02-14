@@ -276,13 +276,81 @@ export default function Header() {
                         <Link href="/freelancers" className="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-gray-700 dark:text-gray-300">{t('freelancers')}</Link>
                         <Link href="/companies" className="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-gray-700 dark:text-gray-300">{t('companies')}</Link>
                         {user ? (
-                            <div className="border-t dark:border-gray-700 pt-4">
-                                {/* ... user links ... */}
+                            <div className="border-t dark:border-gray-700 pt-4 space-y-2">
+                                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg mb-2">
+                                    <p className="font-semibold text-gray-900 dark:text-white">{user.name}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
+                                </div>
+
+                                {user.role === 'ADMIN' && (
+                                    <Link href="/admin/dashboard" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                        <LayoutDashboard className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                        <span>{th('adminDashboard')}</span>
+                                    </Link>
+                                )}
+
+                                {user.role === 'COMPANY' && (
+                                    <>
+                                        <Link href="/company/dashboard" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <LayoutDashboard className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                                            <span>{th('companyDashboard')}</span>
+                                        </Link>
+                                        <Link href="/projects/my" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <FolderOpen className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                                            <span>{th('myProjects')}</span>
+                                        </Link>
+                                        <Link href="/contracts" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <FolderOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                            <span>{th('contracts')}</span>
+                                        </Link>
+                                        <Link href="/company/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <Building2 className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
+                                            <span>{th('companyProfile')}</span>
+                                        </Link>
+                                    </>
+                                )}
+
+                                {user.role === 'USER' && (
+                                    <>
+                                        <Link href="/freelancer/dashboard" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <LayoutDashboard className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                                            <span>{th('freelancerDashboard')}</span>
+                                        </Link>
+                                        <Link href="/freelancer/proposals" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <FileText className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
+                                            <span>{th('myProposals')}</span>
+                                        </Link>
+                                        <Link href="/contracts" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <FolderOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                            <span>{th('myContracts')}</span>
+                                        </Link>
+                                        <Link href="/applications" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                            <span>{th('myApplications')}</span>
+                                        </Link>
+                                        <Link href="/saved-jobs" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <Bookmark className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                                            <span>{th('savedJobs')}</span>
+                                        </Link>
+                                    </>
+                                )}
+
+                                <Link href="/messages" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                    <MessageCircle className="w-4 h-4 text-blue-500" />
+                                    <span>{th('messages')}</span>
+                                </Link>
+
+                                <Link href="/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                    <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                    <span>{th('accountSettings')}</span>
+                                </Link>
+
                                 <button
                                     onClick={logout}
-                                    className="w-full text-right p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
                                 >
-                                    {t('logout')}
+                                    <LogOut className="w-4 h-4" />
+                                    <span>{t('logout')}</span>
                                 </button>
                             </div>
                         ) : (

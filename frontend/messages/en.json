@@ -12,6 +12,33 @@
             "projects": "Freelance Projects",
             "freelancers": "Active Freelancers",
             "satisfaction": "Satisfaction Rate"
+        },
+        "features": {
+            "title": "Why Choose JobBoard?",
+            "secure": "Secure Payments",
+            "secureDesc": "We hold payments in escrow until the work is approved.",
+            "verified": "Verified Profiles",
+            "verifiedDesc": "We verify freelancers and companies to ensure quality.",
+            "support": "24/7 Support",
+            "supportDesc": "Our support team is here to help you anytime."
+        },
+        "howItWorks": {
+            "title": "How It Works",
+            "step1": "Create Account",
+            "step1Desc": "Sign up as a freelancer or company.",
+            "step2": "Find Work / Talent",
+            "step2Desc": "Search for jobs or post your project.",
+            "step3": "Get It Done",
+            "step3Desc": "Collaborate and get work done efficiently."
+        },
+        "categories": {
+            "title": "Popular Categories"
+        },
+        "cta": {
+            "title": "Ready to Get Started?",
+            "subtitle": "Join thousands of freelancers and companies already using JobBoard.",
+            "freelancerBtn": "Join as Freelancer",
+            "companyBtn": "Join as Company"
         }
     },
     "Navigation": {

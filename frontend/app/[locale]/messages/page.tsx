@@ -189,7 +189,7 @@ export default function MessagesPage() {
     }
 
     return (
-        <div className="h-screen bg-gray-50 dark:bg-gray-900 pt-20 pb-4 px-4 overflow-hidden flex flex-col">
+        <div className="h-[100dvh] bg-gray-50 dark:bg-gray-900 pt-20 pb-4 px-4 overflow-hidden flex flex-col">
             <div className="container mx-auto h-full max-w-6xl">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden h-full flex border border-gray-200 dark:border-gray-700">
 
