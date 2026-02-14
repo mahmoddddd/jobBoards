@@ -229,7 +229,8 @@ exports.forgotPassword = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // Create reset URL
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'https://job-boards-front.vercel.app';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     try {
       await sendEmail({

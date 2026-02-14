@@ -6,7 +6,7 @@ const userSockets = new Map(); // userId -> socketId
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      origin: ['http://localhost:3000', 'https://job-boards-front.vercel.app', process.env.FRONTEND_URL].filter(Boolean),
       methods: ['GET', 'POST'],
       credentials: true,
     },
