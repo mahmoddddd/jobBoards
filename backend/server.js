@@ -41,6 +41,8 @@ app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/proposals', require('./routes/proposalRoutes'));
 app.use('/api/contracts', require('./routes/contractRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
+app.use('/api/portfolio', require('./routes/portfolioRoutes'));
+app.use('/api/disputes', require('./routes/disputeRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

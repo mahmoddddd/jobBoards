@@ -20,7 +20,8 @@ import {
     FolderOpen,
     FileText,
     MessageCircle,
-    Building2
+    Building2,
+    ShieldAlert
 } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -28,6 +29,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 export default function Header() {
     const t = useTranslations('Navigation');
     const th = useTranslations('Header');
+    const td = useTranslations('Disputes');
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
@@ -181,6 +183,10 @@ export default function Header() {
                                                             <FolderOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
                                                             <span>{th('contracts')}</span>
                                                         </Link>
+                                                        <Link href="/disputes/my" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                                                            <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                                            <span>{td('myDisputes')}</span>
+                                                        </Link>
                                                         <Link href="/company/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                                                             <Building2 className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
                                                             <span>{th('companyProfile')}</span>
@@ -193,6 +199,10 @@ export default function Header() {
                                                             <LayoutDashboard className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                                             <span>{th('freelancerDashboard')}</span>
                                                         </Link>
+                                                        <Link href="/freelancer/portfolio" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                                                            <FolderOpen className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                                                            <span>{th('myPortfolio')}</span>
+                                                        </Link>
                                                         <Link href="/freelancer/proposals" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                                                             <FileText className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
                                                             <span>{th('myProposals')}</span>
@@ -200,6 +210,10 @@ export default function Header() {
                                                         <Link href="/contracts" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                                                             <FolderOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
                                                             <span>{th('myContracts')}</span>
+                                                        </Link>
+                                                        <Link href="/disputes/my" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                                                            <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                                            <span>{td('myDisputes')}</span>
                                                         </Link>
                                                         <Link href="/applications" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                                                             <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -315,6 +329,10 @@ export default function Header() {
                                         <Link href="/freelancer/dashboard" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
                                             <LayoutDashboard className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                             <span>{th('freelancerDashboard')}</span>
+                                        </Link>
+                                        <Link href="/freelancer/portfolio" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <FolderOpen className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                                            <span>{th('myPortfolio')}</span>
                                         </Link>
                                         <Link href="/freelancer/proposals" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
                                             <FileText className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />

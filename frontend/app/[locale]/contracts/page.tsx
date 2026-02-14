@@ -72,6 +72,7 @@ export default function ContractsPage() {
                         { key: 'ALL', label: t('tabs.all') },
                         { key: 'ACTIVE', label: t('tabs.active') },
                         { key: 'COMPLETED', label: t('tabs.completed') },
+                        { key: 'DISPUTED', label: t('status.DISPUTED') },
                     ].map((tab) => (
                         <button key={tab.key} onClick={() => setFilter(tab.key)}
                             className={`px-5 py-2 rounded-lg text-sm font-medium transition ${filter === tab.key ? 'bg-primary-600 text-white shadow' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'

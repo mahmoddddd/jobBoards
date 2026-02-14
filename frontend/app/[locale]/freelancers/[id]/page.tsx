@@ -7,7 +7,7 @@ import { Link } from '@/navigation';
 import {
     Star, MapPin, DollarSign, Clock, Briefcase, Globe, Award,
     CheckCircle, ArrowRight, Loader2, ExternalLink, Code, Smartphone,
-    Palette, PenTool, Megaphone, Database, Video, Music, MoreHorizontal, MessageCircle, ArrowLeft
+    Palette, PenTool, Megaphone, Database, Video, Music, MoreHorizontal, MessageCircle, ArrowLeft, Eye
 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -103,6 +103,8 @@ export default function FreelancerDetailPage() {
     const [activeTab, setActiveTab] = useState<'about' | 'portfolio' | 'reviews'>('about');
     const [contacting, setContacting] = useState(false);
 
+    const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
+
     useEffect(() => {
         if (params.id) fetchProfile();
     }, [params.id]);
@@ -127,9 +129,21 @@ export default function FreelancerDetailPage() {
         }
     };
 
+    const fetchPortfolio = async () => {
+        try {
+            const res = await api.get(`/portfolio/freelancer/${profile?.userId._id}`);
+            setPortfolioItems(res.data.data.items);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
-        if (activeTab === 'reviews' && profile) {
-            fetchReviews();
+        if (profile) {
+            fetchPortfolio();
+            if (activeTab === 'reviews') {
+                fetchReviews();
+            }
         }
     }, [activeTab, profile]);
 
@@ -312,33 +326,36 @@ export default function FreelancerDetailPage() {
 
                 {activeTab === 'portfolio' && (
                     <div>
-                        {profile.portfolio.length === 0 ? (
+                        {portfolioItems.length === 0 ? (
                             <div className="card p-12 text-center">
                                 <Briefcase className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                                 <p className="text-gray-500 dark:text-gray-400">{t('noPortfolio')}</p>
                             </div>
                         ) : (
                             <div className="grid md:grid-cols-2 gap-6">
-                                {profile.portfolio.map((item: PortfolioItem) => (
-                                    <div key={item._id} className="card overflow-hidden group">
-                                        {item.imageUrl && (
+                                {portfolioItems.map((item: any) => (
+                                    <Link href={`/portfolio/${item.slug}`} key={item._id} className="card overflow-hidden group hover:shadow-lg transition-shadow">
+                                        {item.coverImage && (
                                             <div className="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                                                <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                                <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                             </div>
                                         )}
                                         <div className="p-5">
                                             <h4 className="font-bold text-gray-900 dark:text-white mb-2">{item.title}</h4>
                                             {item.description && (
-                                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{item.description}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 truncate">{item.description}</p>
                                             )}
-                                            {item.link && (
-                                                <a href={item.link} target="_blank" rel="noopener noreferrer"
-                                                    className="text-primary-600 hover:underline text-sm flex items-center gap-1">
-                                                    <ExternalLink className="w-4 h-4" /> {t('viewProject')}
-                                                </a>
-                                            )}
+                                            <div className="flex items-center justify-between mt-4">
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                    <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {item.views}</span>
+                                                    <span className="flex items-center gap-1"><Star className="w-3 h-3" /> {item.likes.length}</span>
+                                                </div>
+                                                <span className="text-primary-600 text-sm font-medium flex items-center gap-1">
+                                                    {t('viewProject')} <ArrowRight className="w-3 h-3 ltr:inline rtl:hidden" /><ArrowLeft className="w-3 h-3 rtl:inline ltr:hidden" />
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         )}

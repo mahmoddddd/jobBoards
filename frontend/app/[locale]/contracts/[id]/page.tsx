@@ -8,9 +8,10 @@ import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import {
     Loader2, ArrowRight, ArrowLeft, DollarSign, CheckCircle, Clock, Upload,
-    AlertCircle, Plus, XCircle, FileText, User, Star
+    AlertCircle, Plus, XCircle, FileText, User, Star, ShieldAlert, AlertTriangle, Gavel
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from '@/navigation';
 
 interface Milestone {
     _id: string;
@@ -60,6 +61,7 @@ export default function ContractDetailPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
     const params = useParams();
+    const router = useRouter();
     const { user } = useAuth();
     const [contract, setContract] = useState<ContractDetail | null>(null);
     const [loading, setLoading] = useState(true);
@@ -72,6 +74,14 @@ export default function ContractDetailPage() {
     const [reviewComment, setReviewComment] = useState('');
     const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
+    // Dispute State
+    const [showDisputeModal, setShowDisputeModal] = useState(false);
+    const [disputeReason, setDisputeReason] = useState('');
+    const [disputeSubmitting, setDisputeSubmitting] = useState(false);
+    const [disputeId, setDisputeId] = useState<string | null>(null);
+
+    const td = useTranslations('Disputes');
+
     const isClient = contract && user && contract.clientId._id === user.id;
     const isFreelancer = contract && user && contract.freelancerId._id === user.id;
 
@@ -81,8 +91,38 @@ export default function ContractDetailPage() {
         try {
             const res = await api.get(`/contracts/${params.id}`);
             setContract(res.data.contract);
+            if (res.data.contract.status === 'DISPUTED') {
+                fetchDispute();
+            }
         } catch (error) { console.error(error); }
         finally { setLoading(false); }
+    };
+
+    const fetchDispute = async () => {
+        try {
+            const res = await api.get(`/disputes/my`);
+            const myDisputes = res.data.data.disputes;
+            const currentDispute = myDisputes.find((d: any) => d.contractId._id === params.id && ['OPEN', 'UNDER_REVIEW'].includes(d.status));
+            if (currentDispute) setDisputeId(currentDispute._id);
+        } catch (error) { console.error(error); }
+    };
+
+    const handleOpenDispute = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setDisputeSubmitting(true);
+        try {
+            const res = await api.post('/disputes', {
+                contractId: params.id,
+                reason: disputeReason
+            });
+            toast.success(td('openDispute') + ' تم بنجاح');
+            setShowDisputeModal(false);
+            fetchContract();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'فشل فتح نزاع');
+        } finally {
+            setDisputeSubmitting(false);
+        }
     };
 
     const addMilestone = async (e: React.FormEvent) => {
@@ -167,13 +207,24 @@ export default function ContractDetailPage() {
                             <div className={`flex flex-col gap-2 mt-2 ${isRtl ? 'items-start' : 'items-end'}`}>
                                 <span className={`badge text-sm ${contract.status === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                                     contract.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                                        'bg-gray-100 text-gray-700'
+                                        contract.status === 'DISPUTED' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                            'bg-gray-100 text-gray-700'
                                     }`}>
                                     {t(`status.${contract.status}`)}
                                 </span>
                                 {isClient && contract.status === 'COMPLETED' && (
                                     <button onClick={() => setShowReviewModal(true)} className={`btn-primary text-xs flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
                                         <Star className="w-4 h-4" /> {t('completeContract')}
+                                    </button>
+                                )}
+                                {contract.status === 'DISPUTED' && disputeId && (
+                                    <Link href={`/disputes/${disputeId}`} className={`btn-secondary text-red-600 border-red-200 text-xs flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                        <AlertTriangle className="w-4 h-4" /> {td('title')}
+                                    </Link>
+                                )}
+                                {contract.status === 'ACTIVE' && (
+                                    <button onClick={() => setShowDisputeModal(true)} className={`text-red-500 hover:text-red-600 text-[10px] font-medium mt-1 underline ${isRtl ? 'text-right' : 'text-left'}`}>
+                                        {td('openDispute')}
                                     </button>
                                 )}
                             </div>
@@ -349,6 +400,41 @@ export default function ContractDetailPage() {
                                 <button type="submit" disabled={reviewSubmitting} className={`btn-primary w-full flex items-center justify-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
                                     {reviewSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
                                     {tr('send')}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Dispute Modal */}
+                {showDisputeModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                        <div className={`bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md p-6 shadow-xl animate-fade-in relative ${isRtl ? 'text-right' : 'text-left'}`}>
+                            <button onClick={() => setShowDisputeModal(false)} className={`absolute top-4 ${isRtl ? 'right-4' : 'left-4'} text-gray-400 hover:text-gray-600`}>
+                                <XCircle className="w-6 h-6" />
+                            </button>
+                            <h3 className={`text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                <ShieldAlert className="w-6 h-6 text-red-500" /> {td('openDispute')}
+                            </h3>
+                            <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl mb-4 border border-amber-100 dark:border-amber-900/20">
+                                <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                                    تنبيه: فتح نزاع سيجمد الرصيد المتبقي في العقد وسيتدخل فريق الدعم للفصل بينكما. يرجى محاولة حل المشكلة ودياً أولاً.
+                                </p>
+                            </div>
+                            <form onSubmit={handleOpenDispute} className="space-y-4">
+                                <div>
+                                    <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${isRtl ? 'text-right' : 'text-left'}`}>{td('reason')}</label>
+                                    <textarea
+                                        value={disputeReason}
+                                        onChange={(e) => setDisputeReason(e.target.value)}
+                                        className={`input min-h-[120px] ${isRtl ? 'text-right' : 'text-left'}`}
+                                        placeholder={td('placeholder')}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" disabled={disputeSubmitting} className={`btn-primary bg-red-600 hover:bg-red-700 w-full flex items-center justify-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                    {disputeSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Gavel className="w-5 h-5" />}
+                                    {td('openDispute')}
                                 </button>
                             </form>
                         </div>
