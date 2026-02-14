@@ -178,4 +178,12 @@ export const contractsAPI = {
         api.put(`/contracts/${contractId}/milestones/${milestoneId}`, { status }),
 };
 
+// Users API
+export const usersAPI = {
+    getSavedJobs: () => api.get('/users/saved-jobs'),
+    saveJob: (jobId: string) => api.post('/users/saved-jobs', { jobId }),
+    removeSavedJob: (id: string) => api.delete(`/users/saved-jobs/${id}`),
+    checkSavedJob: (jobId: string) => api.get(`/users/saved-jobs/check/${jobId}`),
+};
+
 export default api;

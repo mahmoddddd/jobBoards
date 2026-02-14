@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { Link } from '@/navigation';
-import { jobsAPI, applicationsAPI, uploadAPI } from '@/lib/api';
+import { jobsAPI, applicationsAPI, uploadAPI, usersAPI } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, ArrowRight, CheckCircle, XCircle, MapPin, Clock, Building2, Briefcase, DollarSign, FileText, Loader2, Upload } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, XCircle, MapPin, Clock, Building2, Briefcase, DollarSign, FileText, Loader2, Upload, Bookmark, BookmarkCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Job {
@@ -49,6 +49,8 @@ export default function JobDetailPage() {
     const [cvFile, setCvFile] = useState<File | null>(null);
     const [coverLetter, setCoverLetter] = useState('');
     const [hasApplied, setHasApplied] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [savedId, setSavedId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -64,6 +66,20 @@ export default function JobDetailPage() {
         fetchJob();
     }, [id, t]);
 
+    // Check if job is saved
+    useEffect(() => {
+        const checkSaved = async () => {
+            if (user?.role === 'USER') {
+                try {
+                    const response = await usersAPI.checkSavedJob(id as string);
+                    setIsSaved(response.data.isSaved);
+                    setSavedId(response.data.savedJobId);
+                } catch (error) { }
+            }
+        };
+        checkSaved();
+    }, [user, id]);
+
     // Check if already applied
     useEffect(() => {
         const checkApplication = async () => {
@@ -77,6 +93,29 @@ export default function JobDetailPage() {
         };
         checkApplication();
     }, [user, id]);
+
+    const toggleSave = async () => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        try {
+            if (isSaved && savedId) {
+                await usersAPI.removeSavedJob(savedId);
+                setIsSaved(false);
+                setSavedId(null);
+                toast.success(t('unsavedSuccess'));
+            } else {
+                const res = await usersAPI.saveJob(id as string);
+                setIsSaved(true);
+                setSavedId(res.data.savedJob?._id || res.data._id);
+                toast.success(t('savedSuccess'));
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || tc('error'));
+        }
+    };
 
     const handleApply = async () => {
         if (!cvFile) {
@@ -274,9 +313,19 @@ export default function JobDetailPage() {
                                 <>
                                     <button
                                         onClick={() => setShowApplyModal(true)}
-                                        className="btn-primary w-full text-lg py-4"
+                                        className="btn-primary w-full text-lg py-4 mb-3"
                                     >
                                         {t('applyNow')}
+                                    </button>
+                                    <button
+                                        onClick={toggleSave}
+                                        className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all font-bold ${isSaved
+                                            ? 'bg-primary-50 border-primary-100 text-primary-600 dark:bg-primary-900/10 dark:border-primary-800'
+                                            : 'bg-white border-gray-100 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+                                            }`}
+                                    >
+                                        {isSaved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
+                                        {isSaved ? t('saved') : t('saveJob')}
                                     </button>
                                     <p className="text-sm text-gray-500 text-center mt-3">
                                         {t('submitResume')}
@@ -284,9 +333,16 @@ export default function JobDetailPage() {
                                 </>
                             ) : !user ? (
                                 <>
-                                    <Link href="/login" className="btn-primary w-full text-lg py-4 block text-center">
+                                    <Link href="/login" className="btn-primary w-full text-lg py-4 mb-3 block text-center">
                                         {t('loginToApply')}
                                     </Link>
+                                    <button
+                                        onClick={() => router.push('/login')}
+                                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-gray-100 bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 transition-all font-bold"
+                                    >
+                                        <Bookmark className="w-5 h-5" />
+                                        {t('saveJob')}
+                                    </button>
                                     <p className="text-sm text-gray-500 text-center mt-3">
                                         {t('loginRequired')}
                                     </p>

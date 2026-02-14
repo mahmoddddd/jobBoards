@@ -123,7 +123,9 @@
             "MID": "Mid Level",
             "SENIOR": "Senior Level",
             "LEAD": "Lead"
-        }
+        },
+        "savedSuccess": "Job saved successfully",
+        "unsavedSuccess": "Job removed from saved"
     },
     "JobDetail": {
         "backToJobs": "Back to Jobs",
@@ -159,7 +161,11 @@
             "error": "An error occurred during application",
             "resumeRequired": "Please upload your resume"
         },
-        "fetchError": "Error fetching job details"
+        "fetchError": "Error fetching job details",
+        "saveJob": "Save Job",
+        "saved": "Saved",
+        "savedSuccess": "Job saved successfully",
+        "unsavedSuccess": "Job removed from saved"
     },
     "About": {
         "title": "About",

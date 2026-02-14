@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/navigation';
 import { useSearchParams } from 'next/navigation';
-import { jobsAPI } from '@/lib/api';
+import { jobsAPI, usersAPI } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import {
     Search,
     MapPin,
@@ -16,9 +18,12 @@ import {
     ChevronRight,
     Loader2,
     Banknote,
-    X
+    X,
+    Bookmark,
+    BookmarkCheck
 } from 'lucide-react';
 import Pagination from '@/components/ui/Pagination';
+import toast from 'react-hot-toast';
 
 interface Job {
     _id: string;
@@ -46,6 +51,8 @@ export default function JobsPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const { user } = useAuth();
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -56,6 +63,49 @@ export default function JobsPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
+    const [savedJobIds, setSavedJobIds] = useState<Record<string, string>>({}); // jobId -> savedId
+
+    useEffect(() => {
+        const fetchSaved = async () => {
+            if (user?.role === 'USER') {
+                try {
+                    const res = await usersAPI.getSavedJobs();
+                    const savedMap: Record<string, string> = {};
+                    res.data.savedJobs.forEach((s: any) => {
+                        savedMap[s.jobId._id] = s._id;
+                    });
+                    setSavedJobIds(savedMap);
+                } catch (error) { }
+            }
+        };
+        fetchSaved();
+    }, [user]);
+
+    const toggleSave = async (e: React.MouseEvent, jobId: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        try {
+            if (savedJobIds[jobId]) {
+                await usersAPI.removeSavedJob(savedJobIds[jobId]);
+                const newSaved = { ...savedJobIds };
+                delete newSaved[jobId];
+                setSavedJobIds(newSaved);
+                toast.success(t('unsavedSuccess'));
+            } else {
+                const res = await usersAPI.saveJob(jobId);
+                setSavedJobIds({ ...savedJobIds, [jobId]: res.data.savedJob?._id || res.data._id });
+                toast.success(t('savedSuccess'));
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || tc('error'));
+        }
+    };
 
     const jobTypes = [
         { value: '', label: t('allTypes') },
@@ -331,6 +381,23 @@ export default function JobsPage() {
                                                                 <Building2 className="w-8 h-8 text-gray-400" />
                                                             )}
                                                         </div>
+
+                                                        {/* Bookmark Button */}
+                                                        {(!user || user.role === 'USER') && (
+                                                            <button
+                                                                onClick={(e) => toggleSave(e, job._id)}
+                                                                className={`absolute -top-2 -right-2 p-2 rounded-xl shadow-lg transition-all z-20 ${savedJobIds[job._id]
+                                                                    ? 'bg-primary-600 text-white scale-110'
+                                                                    : 'bg-white dark:bg-gray-800 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:scale-110'
+                                                                    }`}
+                                                            >
+                                                                {savedJobIds[job._id] ? (
+                                                                    <BookmarkCheck className="w-4 h-4" />
+                                                                ) : (
+                                                                    <Bookmark className="w-4 h-4" />
+                                                                )}
+                                                            </button>
+                                                        )}
                                                     </div>
 
                                                     {/* Job Info */}
