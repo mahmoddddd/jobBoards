@@ -97,20 +97,22 @@ export default function MyProposalsPage() {
                 <p className="text-gray-600 dark:text-gray-400 mb-6">{t('subtitle', { n: proposals.length })}</p>
 
                 {/* Tabs */}
-                <div className="flex gap-1 mb-6 bg-white dark:bg-gray-800 rounded-xl p-1 border border-gray-200 dark:border-gray-700 w-fit">
-                    {[
-                        { key: 'ALL', label: t('tabs.ALL') },
-                        { key: 'PENDING', label: t('tabs.PENDING') },
-                        { key: 'ACCEPTED', label: t('tabs.ACCEPTED') },
-                        { key: 'REJECTED', label: t('tabs.REJECTED') },
-                        { key: 'WITHDRAWN', label: t('tabs.WITHDRAWN') },
-                    ].map((tab) => (
-                        <button key={tab.key} onClick={() => setFilter(tab.key)}
-                            className={`px-5 py-2 rounded-lg text-sm font-medium transition ${filter === tab.key ? 'bg-primary-600 text-white shadow' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                                }`}>
-                            {tab.label}
-                        </button>
-                    ))}
+                <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                    <div className="flex gap-2 min-w-max bg-white dark:bg-gray-800 rounded-xl p-1 border border-gray-200 dark:border-gray-700 w-fit">
+                        {[
+                            { key: 'ALL', label: t('tabs.ALL') },
+                            { key: 'PENDING', label: t('tabs.PENDING') },
+                            { key: 'ACCEPTED', label: t('tabs.ACCEPTED') },
+                            { key: 'REJECTED', label: t('tabs.REJECTED') },
+                            { key: 'WITHDRAWN', label: t('tabs.WITHDRAWN') },
+                        ].map((tab) => (
+                            <button key={tab.key} onClick={() => setFilter(tab.key)}
+                                className={`px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${filter === tab.key ? 'bg-primary-600 text-white shadow' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    }`}>
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* List */}
@@ -125,36 +127,42 @@ export default function MyProposalsPage() {
                             const statusInfo = statusMap[prop.status] || statusMap.PENDING;
                             const StatusIcon = statusInfo.icon;
                             return (
-                                <div key={prop._id} className="card p-6">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex-1">
+                                <div key={prop._id} className="card p-5 md:p-6 hover:shadow-lg transition-all duration-300">
+                                    <div className={`flex flex-col sm:flex-row items-start justify-between gap-3 mb-4 ${isRtl ? 'sm:flex-row-reverse' : ''}`}>
+                                        <div className={`flex-1 ${isRtl ? 'text-right' : 'text-left'}`}>
                                             <Link href={`/projects/${prop.projectId?._id}`}
-                                                className="text-lg font-bold text-gray-900 dark:text-white hover:text-primary-600 transition">
+                                                className="text-lg font-bold text-gray-900 dark:text-white hover:text-primary-600 transition block mb-1">
                                                 {prop.projectId?.title}
                                             </Link>
-                                            <div className="text-sm text-gray-500 mt-1">
-                                                {t('client', { name: prop.projectId?.clientId?.name })} · {new Date(prop.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}
+                                            <div className="text-xs md:text-sm text-gray-500 flex flex-wrap gap-x-2 gap-y-1">
+                                                <span>{t('client', { name: prop.projectId?.clientId?.name })}</span>
+                                                <span className="hidden xs:inline text-gray-300">|</span>
+                                                <span>{new Date(prop.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
                                             </div>
                                         </div>
-                                        <span className={`badge flex items-center gap-1 ${statusInfo.class}`}>
+                                        <span className={`badge flex items-center gap-1 ${statusInfo.class} flex-shrink-0`}>
                                             <StatusIcon className="w-3 h-3" /> {statusInfo.label}
                                         </span>
                                     </div>
 
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{prop.coverLetter}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
+                                        {prop.coverLetter}
+                                    </p>
 
-                                    <div className="flex items-center justify-between pt-3 border-t dark:border-gray-700">
-                                        <div className="flex items-center gap-4 text-sm">
-                                            <span className="flex items-center gap-1 font-bold text-green-600">
+                                    <div className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t dark:border-gray-700 ${isRtl ? 'sm:flex-row-reverse' : ''}`}>
+                                        <div className={`flex items-center gap-4 text-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                            <span className="flex items-center gap-1 font-bold text-green-600 dark:text-green-400">
                                                 <DollarSign className="w-4 h-4" /> {prop.bidAmount} {t('currency')}
                                             </span>
-                                            <span className="flex items-center gap-1 text-gray-500">
+                                            <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                                 <Clock className="w-4 h-4" /> {durationMap[prop.estimatedDuration]}
                                             </span>
                                         </div>
                                         {prop.status === 'PENDING' && (
-                                            <button onClick={() => withdrawProposal(prop._id)}
-                                                className="text-red-500 hover:text-red-600 text-sm flex items-center gap-1">
+                                            <button
+                                                onClick={() => withdrawProposal(prop._id)}
+                                                className="text-red-500 hover:text-red-600 dark:hover:text-red-400 text-sm flex items-center justify-center gap-1 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                                            >
                                                 <Trash2 className="w-4 h-4" /> {t('withdrawParams')}
                                             </button>
                                         )}

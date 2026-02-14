@@ -36,43 +36,43 @@ export default async function Home() {
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-radial from-secondary-400/30 to-transparent rounded-full blur-3xl"></div>
 
-                <div className="container mx-auto px-4 pt-32 pb-24 md:pt-40 md:pb-32 relative z-10">
+                <div className="container mx-auto px-4 pt-24 pb-16 md:pt-40 md:pb-32 relative z-10 transition-all">
                     <div className="max-w-4xl mx-auto text-center">
-                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in">
-                            <Zap className="w-4 h-4 text-yellow-400" />
-                            <span className="text-sm">JobBoard Platform</span>
+                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in text-xs md:text-sm">
+                            <Zap className="w-3 md:w-4 h-3 md:h-4 text-yellow-400" />
+                            <span>JobBoard Platform</span>
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up">
+                        <h1 className="text-3xl md:text-6xl font-bold mb-4 md:mb-6 leading-tight animate-slide-up px-2">
                             {t('title')}
                         </h1>
 
-                        <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto">
+                        <p className="text-base md:text-xl text-gray-200 mb-8 md:mb-10 max-w-2xl mx-auto px-4 opacity-90">
                             {t('subtitle')}
                         </p>
 
                         {/* Search Box */}
-                        <div className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl mx-auto">
-                            <div className="flex flex-col md:flex-row gap-2">
+                        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl p-1.5 md:p-2 shadow-2xl max-w-2xl mx-auto mx-2 md:mx-auto border border-white/20">
+                            <div className="flex flex-col md:flex-row gap-1.5 md:gap-2">
                                 <div className="flex-1 relative">
-                                    <Search className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 left-4 rtl:right-4 rtl:left-auto ltr:left-4 ltr:right-auto" />
+                                    <Search className="absolute top-1/2 -translate-y-1/2 w-4 md:w-5 h-4 md:h-5 text-gray-400 left-4 rtl:right-4 rtl:left-auto" />
                                     <input
                                         type="text"
                                         placeholder={t('searchPlaceholder')}
-                                        className="w-full py-4 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 pl-12 pr-4 rtl:pr-12 rtl:pl-4 ltr:pl-12 ltr:pr-4"
+                                        className="w-full py-3 md:py-4 rounded-xl text-gray-800 dark:text-white bg-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 px-11 md:px-12 text-sm md:text-base"
                                     />
                                 </div>
-                                <Link href="/jobs" className="btn-primary whitespace-nowrap flex items-center justify-center">
+                                <Link href="/jobs" className="btn-primary py-3 md:py-4 px-6 md:px-8 whitespace-nowrap flex items-center justify-center gap-2 text-sm md:text-base font-bold shadow-soft">
                                     {t('searchButton')}
-                                    <ArrowLeft className="w-5 h-5 ml-2 rtl:rotate-180 ltr:ml-2" />
+                                    <ArrowLeft className="w-4 md:w-5 h-4 md:h-5 transition-transform rtl:rotate-180" />
                                 </Link>
                             </div>
                         </div>
 
                         {/* Quick Links */}
-                        <div className="flex flex-wrap justify-center gap-3 mt-8">
-                            <Link href="/jobs" className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-sm transition-all">
-                                🏢 {t('browseJobs')}
+                        <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-8 px-2">
+                            <Link href="/jobs" className="px-3 py-1.5 md:px-4 md:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-xs md:text-sm transition-all border border-white/5">
+                                🏢 <span className="hidden xs:inline">{t('browseJobs')}</span><span className="xs:hidden">{t('browseJobs').split(' ')[0]}</span>
                             </Link>
                             <Link href="/projects" className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-sm transition-all">
                                 📋 {t('browseProjects')}

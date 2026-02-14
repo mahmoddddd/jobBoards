@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api, { jobsAPI, companiesAPI } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
     Briefcase,
     Building2,
@@ -57,6 +57,7 @@ export default function AdminDashboard() {
     const t = useTranslations('AdminDashboard');
     const { user } = useAuth();
     const router = useRouter();
+    const locale = useLocale();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<Stats>({ pendingJobs: 0, pendingCompanies: 0, totalJobs: 0, totalCompanies: 0 });
     const [pendingJobs, setPendingJobs] = useState<Job[]>([]);
@@ -157,48 +158,48 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div className="card p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
-                                <Clock className="w-6 h-6 text-yellow-600" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
+                    <div className="card p-4 md:p-6 transition-transform hover:scale-[1.02]">
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
+                                <Clock className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
                             </div>
                             <div>
-                                <div className="text-2xl font-bold">{stats.pendingJobs}</div>
-                                <div className="text-sm text-gray-500">{t('stats.pendingJobs')}</div>
+                                <div className="text-xl md:text-2xl font-bold">{stats.pendingJobs}</div>
+                                <div className="text-xs md:text-sm text-gray-500">{t('stats.pendingJobs')}</div>
                             </div>
                         </div>
                     </div>
-                    <div className="card p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                                <Building2 className="w-6 h-6 text-orange-600" />
+                    <div className="card p-4 md:p-6 transition-transform hover:scale-[1.02]">
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-orange-100 flex items-center justify-center">
+                                <Building2 className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
                             </div>
                             <div>
-                                <div className="text-2xl font-bold">{stats.pendingCompanies}</div>
-                                <div className="text-sm text-gray-500">{t('stats.pendingCompanies')}</div>
+                                <div className="text-xl md:text-2xl font-bold">{stats.pendingCompanies}</div>
+                                <div className="text-xs md:text-sm text-gray-500">{t('stats.pendingCompanies')}</div>
                             </div>
                         </div>
                     </div>
-                    <div className="card p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
-                                <Briefcase className="w-6 h-6 text-primary-600" />
+                    <div className="card p-4 md:p-6 transition-transform hover:scale-[1.02]">
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary-100 flex items-center justify-center">
+                                <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-primary-600" />
                             </div>
                             <div>
-                                <div className="text-2xl font-bold">{stats.totalJobs}</div>
-                                <div className="text-sm text-gray-500">{t('stats.totalJobs')}</div>
+                                <div className="text-xl md:text-2xl font-bold">{stats.totalJobs}</div>
+                                <div className="text-xs md:text-sm text-gray-500">{t('stats.totalJobs')}</div>
                             </div>
                         </div>
                     </div>
-                    <div className="card p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-secondary-100 flex items-center justify-center">
-                                <Users className="w-6 h-6 text-secondary-600" />
+                    <div className="card p-4 md:p-6 transition-transform hover:scale-[1.02]">
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-secondary-100 flex items-center justify-center">
+                                <Users className="w-5 h-5 md:w-6 md:h-6 text-secondary-600" />
                             </div>
                             <div>
-                                <div className="text-2xl font-bold">{stats.totalCompanies}</div>
-                                <div className="text-sm text-gray-500">{t('stats.totalCompanies')}</div>
+                                <div className="text-xl md:text-2xl font-bold">{stats.totalCompanies}</div>
+                                <div className="text-xs md:text-sm text-gray-500">{t('stats.totalCompanies')}</div>
                             </div>
                         </div>
                     </div>
@@ -206,30 +207,36 @@ export default function AdminDashboard() {
 
                 {/* Charts */}
                 {chartData && (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                        <StatsLineChart
-                            data={chartData.applicationsOverTime}
-                            title={t('charts.applicationsWeek')}
-                            color="#6366f1"
-                        />
-                        <StatsPieChart
-                            data={jobStatusColors.filter(c => c.value > 0)}
-                            title={t('charts.jobsByStatus')}
-                        />
-                        <StatsBarChart
-                            data={chartData.topCompanies}
-                            title={t('charts.topCompanies')}
-                            color="#8b5cf6"
-                        />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
+                        <div className="col-span-1 lg:col-span-1">
+                            <StatsLineChart
+                                data={chartData.applicationsOverTime}
+                                title={t('charts.applicationsWeek')}
+                                color="#6366f1"
+                            />
+                        </div>
+                        <div className="col-span-1">
+                            <StatsPieChart
+                                data={jobStatusColors.filter(c => c.value > 0)}
+                                title={t('charts.jobsByStatus')}
+                            />
+                        </div>
+                        <div className="col-span-1">
+                            <StatsBarChart
+                                data={chartData.topCompanies}
+                                title={t('charts.topCompanies')}
+                                color="#8b5cf6"
+                            />
+                        </div>
                     </div>
                 )}
 
                 {/* Tabs */}
-                <div className="card">
-                    <div className="border-b flex">
+                <div className="card overflow-hidden">
+                    <div className="border-b flex overflow-x-auto scrollbar-hide">
                         <button
                             onClick={() => setActiveTab('jobs')}
-                            className={`px-6 py-4 font-medium transition-colors ${activeTab === 'jobs'
+                            className={`px-4 md:px-6 py-3 md:py-4 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${activeTab === 'jobs'
                                 ? 'text-primary-600 border-b-2 border-primary-600'
                                 : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -238,7 +245,7 @@ export default function AdminDashboard() {
                         </button>
                         <button
                             onClick={() => setActiveTab('companies')}
-                            className={`px-6 py-4 font-medium transition-colors ${activeTab === 'companies'
+                            className={`px-4 md:px-6 py-3 md:py-4 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${activeTab === 'companies'
                                 ? 'text-primary-600 border-b-2 border-primary-600'
                                 : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -251,38 +258,38 @@ export default function AdminDashboard() {
                     {activeTab === 'jobs' && (
                         <div>
                             {pendingJobs.length === 0 ? (
-                                <div className="p-12 text-center text-gray-500">
-                                    <CheckCircle className="w-16 h-16 mx-auto text-green-400 mb-4" />
+                                <div className="p-8 md:p-12 text-center text-gray-500">
+                                    <CheckCircle className="w-12 h-12 md:w-16 md:h-16 mx-auto text-green-400 mb-4" />
                                     <p>{t('empty.jobs')}</p>
                                 </div>
                             ) : (
-                                <div className="divide-y">
+                                <div className="divide-y dark:divide-gray-700">
                                     {pendingJobs.map((job) => (
-                                        <div key={job._id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                                        <div key={job._id} className="p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 gap-3">
                                             <div>
-                                                <div className="font-semibold">{job.title}</div>
-                                                <div className="text-sm text-gray-500">
-                                                    {job.companyId.name} • {new Date(job.createdAt).toLocaleDateString('ar-EG')}
+                                                <div className="font-semibold text-gray-900 dark:text-white leading-tight">{job.title}</div>
+                                                <div className="text-xs md:text-sm text-gray-500 mt-1">
+                                                    {job.companyId.name} • {new Date(job.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5 self-end sm:self-center">
                                                 <Link
                                                     href={`/jobs/${job._id}`}
-                                                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                                                    className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                                 >
-                                                    <Eye className="w-4 h-4" />
+                                                    <Eye className="w-4 h-4 md:w-5 md:h-5" />
                                                 </Link>
                                                 <button
                                                     onClick={() => updateJobStatus(job._id, 'APPROVED')}
-                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                                                    className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                                                 >
-                                                    <Check className="w-4 h-4" />
+                                                    <Check className="w-4 h-4 md:w-5 md:h-5" />
                                                 </button>
                                                 <button
                                                     onClick={() => updateJobStatus(job._id, 'REJECTED')}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                                                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <X className="w-4 h-4 md:w-5 md:h-5" />
                                                 </button>
                                             </div>
                                         </div>

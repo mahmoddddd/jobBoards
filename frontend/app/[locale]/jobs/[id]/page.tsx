@@ -155,71 +155,71 @@ export default function JobDetailPage() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="container mx-auto px-4">
                 {/* Breadcrumb */}
-                <div className={`flex items-center gap-2 text-sm text-gray-500 mb-6 ${isRtl ? 'flex-row-reverse justify-end' : ''}`}>
-                    <Link href="/" className="hover:text-primary-600">{tc('home')}</Link>
-                    <span>/</span>
-                    <Link href="/jobs" className="hover:text-primary-600">{tj('title')}</Link>
-                    <span>/</span>
-                    <span className="text-gray-900 truncate max-w-[200px]">{job.title}</span>
+                <div className={`flex items-center gap-2 text-[10px] md:text-sm text-gray-500 mb-4 md:mb-6 overflow-hidden ${isRtl ? 'flex-row-reverse justify-end' : ''}`}>
+                    <Link href="/" className="hover:text-primary-600 flex-shrink-0">{tc('home')}</Link>
+                    <span className="flex-shrink-0">/</span>
+                    <Link href="/jobs" className="hover:text-primary-600 flex-shrink-0">{tj('title')}</Link>
+                    <span className="flex-shrink-0">/</span>
+                    <span className="text-gray-900 truncate max-w-[120px] md:max-w-[300px]">{job.title}</span>
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Header Card */}
-                        <div className="card p-6">
-                            <div className="flex items-start gap-4">
-                                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center flex-shrink-0">
+                        <div className="card p-5 md:p-6">
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
+                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
                                     {job.companyId.logo ? (
                                         <img src={job.companyId.logo} alt={job.companyId.name} className="w-full h-full object-cover rounded-xl" />
                                     ) : (
-                                        <Building2 className="w-10 h-10 text-gray-400" />
+                                        <Building2 className="w-8 h-8 md:w-10 md:h-10 text-gray-400" />
                                     )}
                                 </div>
-                                <div className="flex-1">
-                                    <h1 className={`text-2xl font-bold text-gray-900 mb-2 ${isRtl ? 'text-right' : 'text-left'}`}>{job.title}</h1>
+                                <div className="flex-1 w-full">
+                                    <h1 className={`text-xl md:text-2xl font-bold text-gray-900 mb-1.5 ${isRtl ? 'md:text-right' : 'md:text-left'}`}>{job.title}</h1>
                                     <Link href={`/companies/${job.companyId._id}`} className={`text-primary-600 hover:underline font-medium block ${isRtl ? 'text-right' : 'text-left'}`}>
                                         {job.companyId.name}
                                     </Link>
-                                    <div className={`flex flex-wrap items-center gap-3 mt-3 text-sm text-gray-500 ${isRtl ? 'flex-row-reverse justify-end' : ''}`}>
+                                    <div className={`flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3 text-xs md:text-sm text-gray-500 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
                                         <span className="flex items-center gap-1">
-                                            <MapPin className="w-4 h-4" />
+                                            <MapPin className="w-3.5 h-3.5" />
                                             {job.location}
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            <Briefcase className="w-4 h-4" />
+                                            <Briefcase className="w-3.5 h-3.5" />
                                             {getExperienceLabel(job.experienceLevel)}
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            <Clock className="w-4 h-4" />
+                                            <Clock className="w-3.5 h-3.5" />
                                             {new Date(job.createdAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
                                         </span>
-                                        <span className={`badge ${typeBadge.class}`}>{typeBadge.label}</span>
+                                        <span className={`badge py-0.5 px-2 text-[10px] md:text-xs ${typeBadge.class}`}>{typeBadge.label}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Quick Info */}
-                            <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t ${isRtl ? 'text-right' : 'text-left'}`}>
+                            <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6 pt-6 border-t dark:border-gray-700/50 ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
                                 {job.salaryMin && (
-                                    <div>
-                                        <div className="text-sm text-gray-500">{t('salary')}</div>
-                                        <div className="font-semibold text-primary-600 flex items-center gap-1">
+                                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl md:bg-transparent md:p-0">
+                                        <div className="text-[10px] md:text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">{t('salary')}</div>
+                                        <div className="text-xs md:text-base font-bold text-primary-600 flex items-center gap-1">
                                             {job.salaryMin.toLocaleString()} - {job.salaryMax?.toLocaleString()} {job.salaryCurrency === 'EGP' ? tj('currencySymbol') : job.salaryCurrency}
                                         </div>
                                     </div>
                                 )}
-                                <div>
-                                    <div className="text-sm text-gray-500">{t('jobType')}</div>
-                                    <div className="font-semibold">{typeBadge.label}</div>
+                                <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl md:bg-transparent md:p-0">
+                                    <div className="text-[10px] md:text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">{t('jobType')}</div>
+                                    <div className="text-xs md:text-base font-bold">{typeBadge.label}</div>
                                 </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">{t('experience')}</div>
-                                    <div className="font-semibold">{getExperienceLabel(job.experienceLevel)}</div>
+                                <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl md:bg-transparent md:p-0">
+                                    <div className="text-[10px] md:text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">{t('experience')}</div>
+                                    <div className="text-xs md:text-base font-bold">{getExperienceLabel(job.experienceLevel)}</div>
                                 </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">{t('applicants')}</div>
-                                    <div className="font-semibold">{t('applicantsCount', { n: job.applicationCount })}</div>
+                                <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl md:bg-transparent md:p-0">
+                                    <div className="text-[10px] md:text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">{t('applicants')}</div>
+                                    <div className="text-xs md:text-base font-bold">{t('applicantsCount', { n: job.applicationCount })}</div>
                                 </div>
                             </div>
                         </div>

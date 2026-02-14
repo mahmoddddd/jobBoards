@@ -196,3 +196,32 @@ exports.getMyDisputes = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+// @desc    Get all disputes (Admin)
+// @route   GET /api/disputes
+// @access  Private/Admin
+exports.getAllDisputes = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+
+    const disputes = await Dispute.find(filter)
+      .populate('initiatorId', 'name email')
+      .populate('defendantId', 'name email')
+      .populate('contractId', 'title')
+      .sort('-createdAt');
+
+    res.status(200).json({
+      success: true,
+      count: disputes.length,
+      data: {
+        disputes
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

@@ -68,6 +68,7 @@
         "myApplications": "My Applications",
         "savedJobs": "Saved Jobs",
         "resumeBuilder": "Resume Builder",
+        "myWallet": "My Wallet",
         "accountSettings": "Account Settings"
     },
     "Footer": {
@@ -956,6 +957,52 @@
             "manageCompaniesDesc": "View and manage all companies",
             "manageUsers": "Manage Users",
             "manageUsersDesc": "View and manage all users"
+        }
+    },
+    "Wallet": {
+        "title": "My Wallet",
+        "balance": "Current Balance",
+        "available": "Available for withdrawal",
+        "pending": "Pending clearance",
+        "deposit": "Deposit Funds",
+        "withdraw": "Withdraw Funds",
+        "history": "Transaction History",
+        "noTransactions": "No transactions found",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Date",
+        "description": "Description",
+        "types": {
+            "DEPOSIT": "Deposit",
+            "WITHDRAWAL": "Withdrawal",
+            "PAYMENT": "Payment",
+            "EARNING": "Earning",
+            "REFUND": "Refund"
+        },
+        "statuses": {
+            "PENDING": "Pending",
+            "COMPLETED": "Completed",
+            "FAILED": "Failed",
+            "CANCELLED": "Cancelled"
+        },
+        "depositModal": {
+            "title": "Deposit Funds",
+            "amount": "Amount ($)",
+            "card": "Credit/Debit Card",
+            "confirm": "Confirm Payment",
+            "processing": "Processing..."
+        },
+        "withdrawModal": {
+            "title": "Withdraw Funds",
+            "amount": "Amount ($)",
+            "method": "Withdrawal Method",
+            "paypal": "PayPal",
+            "bank": "Bank Transfer",
+            "details": "Account Details",
+            "confirm": "Request Withdrawal",
+            "processing": "Processing...",
+            "insufficient": "Insufficient balance"
         }
     }
 }

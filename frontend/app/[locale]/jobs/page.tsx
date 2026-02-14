@@ -152,7 +152,7 @@ export default function JobsPage() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder={t('searchPlaceholder')}
-                                className={`w-full h-14 ${isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} rounded-xl bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700/50 transition-colors`}
+                                className={`w-full h-12 md:h-14 ${isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} rounded-xl bg-transparent text-sm md:text-base text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700/50 transition-colors`}
                             />
                         </div>
                         <div className="w-px bg-gray-200 dark:bg-gray-700 hidden md:block my-2"></div>
@@ -163,10 +163,10 @@ export default function JobsPage() {
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
                                 placeholder={t('locationPlaceholder')}
-                                className={`w-full h-14 ${isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} rounded-xl bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700/50 transition-colors`}
+                                className={`w-full h-12 md:h-14 ${isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} rounded-xl bg-transparent text-sm md:text-base text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700/50 transition-colors`}
                             />
                         </div>
-                        <button type="submit" className="btn-primary h-14 px-8 text-lg shadow-lg hover:shadow-primary-500/25">
+                        <button type="submit" className="btn-primary h-12 md:h-14 px-8 text-base md:text-lg shadow-lg hover:shadow-primary-500/25">
                             {t('search')}
                         </button>
                     </form>
@@ -336,31 +336,28 @@ export default function JobsPage() {
                                                     {/* Job Info */}
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate">
+                                                            <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate">
                                                                 {job.title}
                                                             </h3>
-                                                            {formatDate(job.createdAt).includes('0') && ( // Simple hack until better date logic
-                                                                <span className="badge-red text-xs px-2 py-0.5 animate-pulse">{tc('new')}</span>
-                                                            )}
                                                         </div>
-                                                        <p className="text-gray-600 dark:text-gray-400 font-medium mb-3 flex items-center gap-1">
+                                                        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium mb-3 flex items-center gap-1">
                                                             <Building2 className="w-4 h-4" />
                                                             {job.companyId.name}
                                                         </p>
 
-                                                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-                                                            <span className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-2.5 py-1 rounded-lg">
-                                                                <MapPin className="w-4 h-4 text-gray-400" />
+                                                        <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                                                            <span className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 px-2 md:px-2.5 py-1 rounded-lg">
+                                                                <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
                                                                 {job.location}
                                                             </span>
-                                                            <span className={`badge ${typeBadge.class} flex items-center gap-1.5 px-2.5 py-1 rounded-lg`}>
-                                                                <Briefcase className="w-3.5 h-3.5" />
+                                                            <span className={`badge ${typeBadge.class} flex items-center gap-1.5 px-2 md:px-2.5 py-1 rounded-lg`}>
+                                                                <Briefcase className="w-3 md:w-3.5 h-3 md:h-3.5" />
                                                                 {typeBadge.label}
                                                             </span>
 
                                                             {job.salaryMin && (
-                                                                <span className="hidden md:flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium px-2.5 py-1">
-                                                                    <Banknote className="w-4 h-4" />
+                                                                <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-bold px-1.5 md:px-2.5 py-1">
+                                                                    <Banknote className="w-3.5 md:w-4 h-3.5 md:h-4" />
                                                                     {job.salaryMin.toLocaleString()}{t('currencySymbol')}
                                                                 </span>
                                                             )}
@@ -368,14 +365,14 @@ export default function JobsPage() {
                                                     </div>
 
                                                     {/* Action / Time */}
-                                                    <div className={`flex flex-row md:flex-col justify-between items-end gap-2 ${isRtl ? 'md:pr-2 md:border-r' : 'md:pl-2 md:border-l'} border-gray-100 dark:border-gray-700 pt-4 md:pt-0 mt-2 md:mt-0`}>
-                                                        <div className={`w-full ${isRtl ? 'text-right' : 'text-left'}`}>
-                                                            <span className={`text-xs text-gray-400 flex items-center gap-1 ${isRtl ? 'justify-end' : 'justify-start'}`}>
+                                                    <div className={`flex flex-row md:flex-col justify-between items-center md:items-end gap-2 ${isRtl ? 'md:pr-4 md:border-r' : 'md:pl-4 md:border-l'} border-gray-100 dark:border-gray-700 pt-4 md:pt-0 mt-2 md:mt-0`}>
+                                                        <div className={`flex-shrink-0 ${isRtl ? 'text-right' : 'text-left'}`}>
+                                                            <span className={`text-[10px] md:text-xs text-gray-400 flex items-center gap-1 ${isRtl ? 'justify-end' : 'justify-start'}`}>
                                                                 <Clock className="w-3 h-3" />
                                                                 {formatDate(job.createdAt)}
                                                             </span>
                                                         </div>
-                                                        <button className="btn-primary-outline w-full md:w-auto text-sm py-2 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                                                        <button className="btn-primary md:btn-primary-outline w-auto px-4 md:px-6 py-2 text-xs md:text-sm font-bold group-hover:bg-primary-600 group-hover:text-white transition-colors shadow-soft">
                                                             {t('viewDetails')}
                                                         </button>
                                                     </div>

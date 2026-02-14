@@ -59,9 +59,9 @@ export default function LoginPage() {
                 </div>
 
                 {/* Card */}
-                <div className="card p-8">
-                    <h1 className="text-2xl font-bold text-center mb-2">{t('loginTitle')}</h1>
-                    <p className="text-gray-600 text-center mb-8">{t('loginSubtitle')}</p>
+                <div className="card p-6 md:p-8">
+                    <h1 className="text-xl md:text-2xl font-bold text-center mb-2">{t('loginTitle')}</h1>
+                    <p className="text-sm md:text-base text-gray-600 text-center mb-6 md:mb-8">{t('loginSubtitle')}</p>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                         <div>

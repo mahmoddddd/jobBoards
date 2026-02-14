@@ -132,34 +132,34 @@ export default function CompanyPage() {
                         {t('backToCompanies')}
                     </Link>
 
-                    <div className={`flex flex-col md:flex-row items-center md:items-start gap-8 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
-                        <div className={`w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-white p-2 shadow-2xl transform ${isRtl ? '-rotate-3' : 'rotate-3'} hover:rotate-0 transition-transform duration-300`}>
+                    <div className={`flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
+                        <div className={`w-24 h-24 md:w-40 md:h-40 rounded-3xl bg-white p-2 shadow-2xl transform ${isRtl ? '-rotate-3' : 'rotate-3'} hover:rotate-0 transition-transform duration-300 flex-shrink-0`}>
                             {company.logo ? (
                                 <img src={company.logo} alt={company.name} className="w-full h-full object-contain rounded-2xl" />
                             ) : (
-                                <div className="w-full h-full bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-6xl font-bold">
+                                <div className="w-full h-full bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-3xl md:text-6xl font-bold">
                                     {company.name.charAt(0)}
                                 </div>
                             )}
                         </div>
-                        <div className={`text-center flex-1 ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
-                            <h1 className="text-4xl md:text-5xl font-bold mb-4">{company.name}</h1>
-                            <div className="flex flex-wrap justify-center md:justify-start gap-6 text-white/90">
+                        <div className={`text-center flex-1 w-full ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
+                            <h1 className="text-2xl md:text-5xl font-bold mb-4">{company.name}</h1>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-6 text-white/90">
                                 {company.industry && (
-                                    <span className={`flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                        <Building2 className="w-5 h-5" />
+                                    <span className={`flex items-center gap-1.5 bg-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full backdrop-blur-sm text-xs md:text-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                        <Building2 className="w-4 h-4 md:w-5 md:h-5" />
                                         {t(`industries.${company.industry}`) || company.industry}
                                     </span>
                                 )}
                                 {company.location && (
-                                    <span className={`flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                        <MapPin className="w-5 h-5" />
+                                    <span className={`flex items-center gap-1.5 bg-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full backdrop-blur-sm text-xs md:text-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                        <MapPin className="w-4 h-4 md:w-5 md:h-5" />
                                         {company.location}
                                     </span>
                                 )}
                                 {company.size && (
-                                    <span className={`flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                        <Users className="w-5 h-5" />
+                                    <span className={`flex items-center gap-1.5 bg-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full backdrop-blur-sm text-xs md:text-sm ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                        <Users className="w-4 h-4 md:w-5 md:h-5" />
                                         {t('employees', { n: company.size })}
                                     </span>
                                 )}
@@ -175,10 +175,10 @@ export default function CompanyPage() {
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* Tabs */}
-                        <div className={`flex border-b border-gray-200 dark:border-gray-700 mb-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                        <div className={`flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto scrollbar-hide ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <button
                                 onClick={() => setActiveTab('about')}
-                                className={`px-6 py-3 font-medium transition-all relative ${activeTab === 'about'
+                                className={`px-4 md:px-6 py-3 font-medium transition-all relative whitespace-nowrap ${activeTab === 'about'
                                     ? 'text-primary-600 dark:text-primary-400'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
@@ -187,7 +187,7 @@ export default function CompanyPage() {
                             </button>
                             <button
                                 onClick={() => setActiveTab('jobs')}
-                                className={`px-6 py-3 font-medium transition-all relative ${activeTab === 'jobs'
+                                className={`px-4 md:px-6 py-3 font-medium transition-all relative whitespace-nowrap ${activeTab === 'jobs'
                                     ? 'text-primary-600 dark:text-primary-400'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
@@ -197,7 +197,7 @@ export default function CompanyPage() {
                             </button>
                             <button
                                 onClick={() => setActiveTab('reviews')}
-                                className={`px-6 py-3 font-medium transition-all relative ${activeTab === 'reviews'
+                                className={`px-4 md:px-6 py-3 font-medium transition-all relative whitespace-nowrap ${activeTab === 'reviews'
                                     ? 'text-primary-600 dark:text-primary-400'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >

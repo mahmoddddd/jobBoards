@@ -102,44 +102,44 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Card */}
-                <div className="card p-8">
-                    <h1 className="text-2xl font-bold text-center mb-2">{t('registerTitle')}</h1>
-                    <p className="text-gray-600 text-center mb-6">{t('registerSubtitle')}</p>
+                <div className="card p-5 md:p-8">
+                    <h1 className="text-xl md:text-2xl font-bold text-center mb-1.5">{t('registerTitle')}</h1>
+                    <p className="text-sm md:text-base text-gray-600 text-center mb-6">{t('registerSubtitle')}</p>
 
                     {/* Account Type Selector */}
-                    <div className="grid grid-cols-3 gap-3 mb-8">
+                    <div className="grid grid-cols-3 gap-2 md:gap-3 mb-8">
                         <button
                             type="button"
                             onClick={() => { setAccountType('user'); reset(); }}
-                            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all ${accountType === 'user'
+                            className={`flex flex-col items-center justify-center gap-1.5 p-2 md:p-4 rounded-xl border-2 transition-all ${accountType === 'user'
                                 ? 'border-primary-500 bg-primary-50 text-primary-700'
                                 : 'border-gray-200 hover:border-gray-300'
                                 }`}
                         >
-                            <User className="w-5 h-5" />
-                            <span className="font-medium text-sm">{t('jobSeeker')}</span>
+                            <User className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="font-bold text-[10px] md:text-sm">{t('jobSeeker')}</span>
                         </button>
                         <button
                             type="button"
                             onClick={() => { setAccountType('freelancer'); reset(); }}
-                            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all ${accountType === 'freelancer'
+                            className={`flex flex-col items-center justify-center gap-1.5 p-2 md:p-4 rounded-xl border-2 transition-all ${accountType === 'freelancer'
                                 ? 'border-secondary-500 bg-secondary-50 text-secondary-700'
                                 : 'border-gray-200 hover:border-gray-300'
                                 }`}
                         >
-                            <Briefcase className="w-5 h-5" />
-                            <span className="font-medium text-sm">{t('freelancer')}</span>
+                            <Briefcase className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="font-bold text-[10px] md:text-sm">{t('freelancer')}</span>
                         </button>
                         <button
                             type="button"
                             onClick={() => { setAccountType('company'); reset(); }}
-                            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all ${accountType === 'company'
+                            className={`flex flex-col items-center justify-center gap-1.5 p-2 md:p-4 rounded-xl border-2 transition-all ${accountType === 'company'
                                 ? 'border-primary-500 bg-primary-50 text-primary-700'
                                 : 'border-gray-200 hover:border-gray-300'
                                 }`}
                         >
-                            <Building2 className="w-5 h-5" />
-                            <span className="font-medium text-sm">{t('company')}</span>
+                            <Building2 className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="font-bold text-[10px] md:text-sm">{t('company')}</span>
                         </button>
                     </div>
 

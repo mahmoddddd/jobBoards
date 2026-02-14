@@ -39,6 +39,8 @@ interface Message {
     createdAt: string;
 }
 
+const getUserID = (u: any) => u._id || u.id;
+
 export default function MessagesPage() {
     const t = useTranslations('Messages');
     const tc = useTranslations('Common');
@@ -52,6 +54,8 @@ export default function MessagesPage() {
     const [messageInput, setMessageInput] = useState('');
     const [loading, setLoading] = useState(true);
     const [loadingMessages, setLoadingMessages] = useState(false);
+    const [typingUser, setTypingUser] = useState<string | null>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +65,7 @@ export default function MessagesPage() {
     }, [user]);
 
     // Handle socket events
+    // Handle socket events
     useEffect(() => {
         if (!socket) return;
 
@@ -69,7 +74,7 @@ export default function MessagesPage() {
             if (activeConversation?._id === data.conversationId) {
                 setMessages((prev) => [...prev, data.message]);
                 // meaningful instant read mark could happen here
-                socket.emit('mark-read', data.conversationId); // if backend supported it via socket, else API call
+                socket.emit('mark-read', { conversationId: data.conversationId, readerId: user?.id });
                 api.put(`/messages/read/${data.conversationId}`).catch(console.error);
             }
 
@@ -82,7 +87,7 @@ export default function MessagesPage() {
                         ...current,
                         lastMessage: {
                             content: data.message.content,
-                            sender: data.message.sender._id,
+                            sender: data.message.sender._id || getUserID(data.message.sender),
                             isRead: false,
                             createdAt: data.message.createdAt
                         },
@@ -90,17 +95,48 @@ export default function MessagesPage() {
                     };
                     return [updated, ...other];
                 } else {
-                    // New conversation started by someone else? (Ideally we re-fetch or push new)
                     fetchConversations(); // lazy refresh
                     return prev;
                 }
             });
         });
 
+        socket.on('typing', (data: { conversationId: string, userName: string }) => {
+            if (activeConversation?._id === data.conversationId) {
+                setTypingUser(data.userName);
+            }
+        });
+
+        socket.on('stop-typing', (data: { conversationId: string }) => {
+            if (activeConversation?._id === data.conversationId) {
+                setTypingUser(null);
+            }
+        });
+
+        socket.on('message-read', (data: { conversationId: string }) => {
+            if (activeConversation?._id === data.conversationId) {
+                setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+            }
+        });
+
         return () => {
             socket.off('new-message');
+            socket.off('typing');
+            socket.off('stop-typing');
+            socket.off('message-read');
         };
-    }, [socket, activeConversation]);
+    }, [socket, activeConversation, user]);
+
+    // Join conversation room
+    useEffect(() => {
+        if (socket && activeConversation) {
+            socket.emit('join-conversation', activeConversation._id);
+            return () => {
+                socket.emit('leave-conversation', activeConversation._id);
+                setTypingUser(null);
+            };
+        }
+    }, [activeConversation, socket]);
 
     // Scroll to bottom when messages change
     useEffect(() => {
@@ -180,6 +216,27 @@ export default function MessagesPage() {
         }
     };
 
+    const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMessageInput(e.target.value);
+
+        if (socket && activeConversation) {
+            socket.emit('typing', {
+                conversationId: activeConversation._id,
+                userId: user?.id,
+                userName: user?.name
+            });
+
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+            typingTimeoutRef.current = setTimeout(() => {
+                socket.emit('stop-typing', {
+                    conversationId: activeConversation._id,
+                    userId: user?.id
+                });
+            }, 2000);
+        }
+    };
+
     const getOtherParticipant = (c: Conversation) => {
         return c.participants.find(p => p._id !== user?.id && p.id !== user?.id) || c.participants[0];
     };
@@ -189,9 +246,9 @@ export default function MessagesPage() {
     }
 
     return (
-        <div className="h-[100dvh] bg-gray-50 dark:bg-gray-900 pt-20 pb-4 px-4 overflow-hidden flex flex-col">
-            <div className="container mx-auto h-full max-w-6xl">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden h-full flex border border-gray-200 dark:border-gray-700">
+        <div className="h-[100dvh] bg-gray-50 dark:bg-gray-900 pt-16 md:pt-20 pb-0 md:pb-4 px-0 md:px-4 overflow-hidden flex flex-col">
+            <div className="container mx-auto h-full max-w-6xl p-0 md:p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-none md:rounded-2xl shadow-none md:shadow-xl overflow-hidden h-full flex border-0 md:border border-gray-200 dark:border-gray-700">
 
                     {/* Sidebar / Conversation List */}
                     <div className={`w-full md:w-1/3 ${isRtl ? 'border-l' : 'border-r'} border-gray-200 dark:border-gray-700 flex flex-col ${activeConversation ? 'hidden md:flex' : 'flex'}`}>
@@ -221,14 +278,13 @@ export default function MessagesPage() {
 
                                     return (
                                         <div key={c._id} onClick={() => loadMessages(c)}
-                                            className={`p-4 border-b border-gray-50 dark:border-gray-700/50 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${activeConversation?._id === c._id ? `bg-primary-50 dark:bg-primary-900/10 border-${isRtl ? 'r' : 'l'}-4 border-${isRtl ? 'r' : 'l'}-primary-600` : ''
+                                            className={`p-3 md:p-4 border-b border-gray-50 dark:border-gray-700/50 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${activeConversation?._id === c._id ? `bg-primary-50 dark:bg-primary-900/10 border-${isRtl ? 'r' : 'l'}-4 border-${isRtl ? 'r' : 'l'}-primary-600` : ''
                                                 }`}>
-                                            <div className="flex items-start gap-3">
-                                                <div className="relative">
-                                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-base md:text-lg shadow-sm">
                                                         {other.name.charAt(0)}
                                                     </div>
-                                                    {/* Online status indicator could go here */}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex justify-between items-center mb-1">
@@ -314,18 +370,28 @@ export default function MessagesPage() {
                                         })
                                     )}
                                     <div ref={messagesEndRef} />
+                                    {typingUser && (
+                                        <div className="flex justify-start px-4 pb-2 animate-fade-in">
+                                            <div className="bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2 flex items-center gap-1">
+                                                <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">{typingUser} is typing</span>
+                                                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Chat Input */}
-                                <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                                    <form onSubmit={handleSendMessage} className="flex items-end gap-2">
+                                <div className="p-2 md:p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                                    <form onSubmit={handleSendMessage} className="flex items-end gap-1.5 md:gap-2">
                                         <button type="button" className="p-3 text-gray-400 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition">
                                             <Paperclip className="w-5 h-5" />
                                         </button>
                                         <div className="flex-1 bg-gray-100 dark:bg-gray-700/50 rounded-xl flex items-center px-4 py-2 border border-transparent focus-within:border-primary-500 focus-within:bg-white dark:focus-within:bg-gray-800 transition-all">
                                             <textarea
                                                 value={messageInput}
-                                                onChange={(e) => setMessageInput(e.target.value)}
+                                                onChange={handleTyping}
                                                 placeholder={t('typeMessage')}
                                                 className="w-full bg-transparent border-none outline-none resize-none max-h-32 text-gray-900 dark:text-white placeholder-gray-400 text-sm"
                                                 rows={1}

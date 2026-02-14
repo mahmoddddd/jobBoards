@@ -69,10 +69,12 @@ interface ActiveMilestone {
     };
 }
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function FreelancerDashboard() {
     const t = useTranslations('FreelancerDashboard');
+    const locale = useLocale();
+    const isRtl = locale === 'ar';
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -177,25 +179,25 @@ export default function FreelancerDashboard() {
             <div className="container mx-auto px-4 max-w-7xl">
                 {/* Header */}
                 <div className="mb-8">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    <div className={`flex items-center justify-between flex-wrap gap-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                        <div className={isRtl ? 'text-right' : 'text-left'}>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                                 {t('title', { name: user.name })}
                             </h1>
                             <p className="text-gray-600 dark:text-gray-400 mt-1">
                                 {t('subtitle')}
                             </p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                             <Link
                                 href="/freelancer/profile"
-                                className="px-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all font-medium text-sm"
+                                className="px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all font-medium text-sm text-center"
                             >
                                 {t('profile')}
                             </Link>
                             <Link
                                 href="/projects"
-                                className="px-4 py-2.5 rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-all font-medium text-sm shadow-lg shadow-primary-600/20"
+                                className="px-5 py-2.5 rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-all font-medium text-sm text-center shadow-lg shadow-primary-600/20"
                             >
                                 {t('browseProjects')}
                             </Link>
@@ -204,51 +206,51 @@ export default function FreelancerDashboard() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="card p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-100 dark:border-green-800/30">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-800/50 flex items-center justify-center">
+                <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className={`card p-5 md:p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-100 dark:border-green-800/30 font-medium ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-3 mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-800/50 flex items-center justify-center flex-shrink-0">
                                 <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('stats.totalEarnings')}</span>
+                            <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">{t('stats.totalEarnings')}</span>
                         </div>
-                        <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+                        <div className="text-xl md:text-2xl font-bold text-green-700 dark:text-green-400">
                             ${stats.totalEarnings.toLocaleString()}
                         </div>
                     </div>
 
-                    <div className="card p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-100 dark:border-blue-800/30">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-800/50 flex items-center justify-center">
+                    <div className={`card p-5 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-100 dark:border-blue-800/30 font-medium ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-3 mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-800/50 flex items-center justify-center flex-shrink-0">
                                 <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('stats.activeContracts')}</span>
+                            <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">{t('stats.activeContracts')}</span>
                         </div>
-                        <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                        <div className="text-xl md:text-2xl font-bold text-blue-700 dark:text-blue-400">
                             {stats.activeContracts}
                         </div>
                     </div>
 
-                    <div className="card p-6 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-100 dark:border-purple-800/30">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-800/50 flex items-center justify-center">
+                    <div className={`card p-5 md:p-6 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-100 dark:border-purple-800/30 font-medium ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-3 mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-800/50 flex items-center justify-center flex-shrink-0">
                                 <CheckCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('stats.completedProjects')}</span>
+                            <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">{t('stats.completedProjects')}</span>
                         </div>
-                        <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+                        <div className="text-xl md:text-2xl font-bold text-purple-700 dark:text-purple-400">
                             {stats.completedProjects}
                         </div>
                     </div>
 
-                    <div className="card p-6 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-amber-100 dark:border-amber-800/30">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center">
+                    <div className={`card p-5 md:p-6 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-amber-100 dark:border-amber-800/30 font-medium ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-3 mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center flex-shrink-0">
                                 <Star className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('stats.rating')}</span>
+                            <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">{t('stats.rating')}</span>
                         </div>
-                        <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+                        <div className="text-xl md:text-2xl font-bold text-amber-700 dark:text-amber-400">
                             {stats.avgRating > 0 ? stats.avgRating.toFixed(1) : t('stats.new')}
                             {stats.avgRating > 0 && <span className="text-sm mr-1">/ 5</span>}
                         </div>
@@ -256,30 +258,30 @@ export default function FreelancerDashboard() {
                 </div>
 
                 {/* Proposals Overview */}
-                <div className="grid lg:grid-cols-3 gap-6 mb-8">
-                    <div className="card p-6">
-                        <div className="flex items-center gap-2 mb-4">
+                <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div className={`card p-6 ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-2 mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <Clock className="w-5 h-5 text-yellow-500" />
                             <span className="font-semibold text-gray-900 dark:text-white">{t('proposalsOverview.pending')}</span>
                         </div>
-                        <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pendingProposals}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('proposalsOverview.pendingDesc')}</p>
+                        <div className="text-2xl md:text-3xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pendingProposals}</div>
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">{t('proposalsOverview.pendingDesc')}</p>
                     </div>
-                    <div className="card p-6">
-                        <div className="flex items-center gap-2 mb-4">
+                    <div className={`card p-6 ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-2 mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <CheckCircle className="w-5 h-5 text-green-500" />
                             <span className="font-semibold text-gray-900 dark:text-white">{t('proposalsOverview.accepted')}</span>
                         </div>
-                        <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.acceptedProposals}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('proposalsOverview.acceptedDesc')}</p>
+                        <div className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">{stats.acceptedProposals}</div>
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">{t('proposalsOverview.acceptedDesc')}</p>
                     </div>
-                    <div className="card p-6">
-                        <div className="flex items-center gap-2 mb-4">
+                    <div className={`card p-6 xs:col-span-2 lg:col-span-1 ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center gap-2 mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <FileText className="w-5 h-5 text-primary-500" />
                             <span className="font-semibold text-gray-900 dark:text-white">{t('proposalsOverview.total')}</span>
                         </div>
-                        <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">{stats.totalProposals}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('proposalsOverview.totalDesc')}</p>
+                        <div className="text-2xl md:text-3xl font-bold text-primary-600 dark:text-primary-400">{stats.totalProposals}</div>
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">{t('proposalsOverview.totalDesc')}</p>
                     </div>
                 </div>
 
@@ -380,8 +382,8 @@ export default function FreelancerDashboard() {
 
                 {/* Quick Actions */}
                 <div className="mt-8 card p-6">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('quickActions.title')}</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <h2 className={`text-lg font-bold text-gray-900 dark:text-white mb-4 ${isRtl ? 'text-right' : 'text-left'}`}>{t('quickActions.title')}</h2>
+                    <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Link
                             href="/projects"
                             className="flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/10 hover:border-primary-200 dark:hover:border-primary-700 transition-all group"
@@ -389,7 +391,7 @@ export default function FreelancerDashboard() {
                             <div className="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <Briefcase className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                             </div>
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('quickActions.browseProjects')}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">{t('quickActions.browseProjects')}</span>
                         </Link>
                         <Link
                             href="/freelancer/proposals"
@@ -398,7 +400,7 @@ export default function FreelancerDashboard() {
                             <div className="w-12 h-12 rounded-xl bg-secondary-100 dark:bg-secondary-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <FileText className="w-6 h-6 text-secondary-600 dark:text-secondary-400" />
                             </div>
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('quickActions.myProposals')}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">{t('quickActions.myProposals')}</span>
                         </Link>
                         <Link
                             href="/contracts"
@@ -407,7 +409,7 @@ export default function FreelancerDashboard() {
                             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <FolderOpen className="w-6 h-6 text-green-600 dark:text-green-400" />
                             </div>
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('quickActions.myContracts')}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">{t('quickActions.myContracts')}</span>
                         </Link>
                         <Link
                             href="/messages"
@@ -416,7 +418,7 @@ export default function FreelancerDashboard() {
                             <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                             </div>
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('quickActions.messages')}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">{t('quickActions.messages')}</span>
                         </Link>
                     </div>
                 </div>

@@ -188,13 +188,13 @@ export default function ProjectDetailPage() {
                                     {new Date(project.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                                 </span>
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{project.title}</h1>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{project.description}</p>
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{project.title}</h1>
+                            <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{project.description}</p>
 
                             {project.skills.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-5 pt-5 border-t dark:border-gray-700">
+                                <div className={`flex flex-wrap gap-1.5 md:gap-2 mt-5 pt-5 border-t dark:border-gray-700 ${isRtl ? 'flex-row-reverse' : ''}`}>
                                     {project.skills.map((s, i) => (
-                                        <span key={i} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm">{s}</span>
+                                        <span key={i} className="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs md:text-sm">{s}</span>
                                     ))}
                                 </div>
                             )}
@@ -229,11 +229,11 @@ export default function ProjectDetailPage() {
                                             </div>
                                         </div>
                                         <div className="flex gap-3">
-                                            <button type="submit" disabled={submitting} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                                            <button type="submit" disabled={submitting} className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 text-sm md:text-base font-bold shadow-soft">
                                                 {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                                                 {submitting ? t('sending') : t('sendProposal')}
                                             </button>
-                                            <button type="button" onClick={() => setShowProposalForm(false)} className="btn-secondary">{tp('cancel')}</button>
+                                            <button type="button" onClick={() => setShowProposalForm(false)} className="btn-secondary py-3 text-sm md:text-base">{tp('cancel')}</button>
                                         </div>
                                     </form>
                                 )}

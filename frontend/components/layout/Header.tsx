@@ -21,7 +21,8 @@ import {
     FileText,
     MessageCircle,
     Building2,
-    ShieldAlert
+    ShieldAlert,
+    Wallet
 } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -187,6 +188,10 @@ export default function Header() {
                                                             <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
                                                             <span>{td('myDisputes')}</span>
                                                         </Link>
+                                                        <Link href="/wallet" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                                                            <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                                            <span>{th('myWallet')}</span>
+                                                        </Link>
                                                         <Link href="/company/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                                                             <Building2 className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
                                                             <span>{th('companyProfile')}</span>
@@ -226,6 +231,10 @@ export default function Header() {
                                                         <Link href="/resume-builder" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                                                             <User className="w-4 h-4 text-green-600 dark:text-green-400" />
                                                             <span>{th('resumeBuilder')}</span>
+                                                        </Link>
+                                                        <Link href="/wallet" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                                                            <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                                            <span>{th('myWallet')}</span>
                                                         </Link>
                                                     </>
                                                 )}
@@ -320,6 +329,10 @@ export default function Header() {
                                             <Building2 className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
                                             <span>{th('companyProfile')}</span>
                                         </Link>
+                                        <Link href="/wallet" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                            <span>{th('myWallet')}</span>
+                                        </Link>
                                     </>
                                 )}
 
@@ -348,6 +361,10 @@ export default function Header() {
                                         <Link href="/saved-jobs" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
                                             <Bookmark className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                                             <span>{th('savedJobs')}</span>
+                                        </Link>
+                                        <Link href="/wallet" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                            <span>{th('myWallet')}</span>
                                         </Link>
                                     </>
                                 )}

@@ -68,6 +68,7 @@
         "myApplications": "طلباتي",
         "savedJobs": "الوظائف المحفوظة",
         "resumeBuilder": "بناء السيرة الذاتية",
+        "myWallet": "محفظتي",
         "accountSettings": "إعدادات الحساب"
     },
     "Footer": {
@@ -981,6 +982,52 @@
             "manageCompaniesDesc": "عرض وإدارة جميع الشركات",
             "manageUsers": "إدارة المستخدمين",
             "manageUsersDesc": "عرض وإدارة جميع المستخدمين"
+        }
+    },
+    "Wallet": {
+        "title": "محفظتي",
+        "balance": "الرصيد الحالي",
+        "available": "متاح للسحب",
+        "pending": "قيد التسوية",
+        "deposit": "إيداع رصيد",
+        "withdraw": "سحب رصيد",
+        "history": "سجل المعاملات",
+        "noTransactions": "لا توجد معاملات",
+        "type": "النوع",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "date": "التاريخ",
+        "description": "الوصف",
+        "types": {
+            "DEPOSIT": "إيداع",
+            "WITHDRAWAL": "سحب",
+            "PAYMENT": "دفع",
+            "EARNING": "أرباح",
+            "REFUND": "استرداد"
+        },
+        "statuses": {
+            "PENDING": "قيد المعالجة",
+            "COMPLETED": "مكتمل",
+            "FAILED": "فشل",
+            "CANCELLED": "ملغي"
+        },
+        "depositModal": {
+            "title": "إيداع رصيد",
+            "amount": "المبلغ ($)",
+            "card": "بطاقة ائتمان",
+            "confirm": "تأكيد الدفع",
+            "processing": "جاري المعالجة..."
+        },
+        "withdrawModal": {
+            "title": "سحب رصيد",
+            "amount": "المبلغ ($)",
+            "method": "طريقة السحب",
+            "paypal": "PayPal",
+            "bank": "تحويل بنكي",
+            "details": "بيانات الحساب",
+            "confirm": "طلب السحب",
+            "processing": "جاري المعالجة...",
+            "insufficient": "رصيد غير كافي"
         }
     }
 }

@@ -24,6 +24,7 @@ import {
     RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useLocale } from 'next-intl';
 import { StatsLineChart, StatsPieChart, StatsBarChart } from '@/components/charts/StatsCharts';
 
 interface Company {
@@ -52,6 +53,8 @@ interface ChartData {
 }
 
 export default function CompanyDashboard() {
+    const locale = useLocale();
+    const isRtl = locale === 'ar';
     const { user } = useAuth();
     const { socket } = useSocket();
     const router = useRouter();
@@ -227,24 +230,24 @@ export default function CompanyDashboard() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-28 pb-12 transition-colors">
             <div className="container mx-auto px-4">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+                    <div className={isRtl ? 'text-right' : 'text-left'}>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
                             <BarChart3 className="w-8 h-8 text-primary-600" />
                             لوحة التحكم
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400">مرحباً بك في {company?.name}</p>
                     </div>
-                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                         <button
                             onClick={() => fetchData(true)}
                             disabled={refreshing}
-                            className="btn-secondary flex items-center gap-2"
+                            className={`btn-secondary flex items-center justify-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}
                         >
                             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                             تحديث
                         </button>
-                        <Link href="/company/jobs/new" className="btn-primary flex items-center gap-2">
+                        <Link href="/company/jobs/new" className={`btn-primary flex items-center justify-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <Plus className="w-5 h-5" />
                             إضافة وظيفة جديدة
                         </Link>
@@ -262,18 +265,18 @@ export default function CompanyDashboard() {
                 )}
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {statCards.map((stat, i) => {
                         const Icon = stat.icon;
                         return (
-                            <div key={i} className="card p-6 hover:shadow-lg transition-shadow group">
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-14 h-14 rounded-2xl ${stat.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                                        <Icon className={`w-7 h-7 ${stat.iconColor}`} />
+                            <div key={i} className="card p-4 md:p-6 hover:shadow-lg transition-shadow group">
+                                <div className={`flex items-center gap-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                    <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl ${stat.bg} flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0`}>
+                                        <Icon className={`w-6 h-6 md:w-7 md:h-7 ${stat.iconColor}`} />
                                     </div>
-                                    <div>
-                                        <div className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
-                                        <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
+                                    <div className={isRtl ? 'text-right' : 'text-left'}>
+                                        <div className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                                        <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{stat.label}</div>
                                     </div>
                                 </div>
                             </div>
@@ -324,69 +327,120 @@ export default function CompanyDashboard() {
                             </Link>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 dark:bg-gray-800">
-                                    <tr>
-                                        <th className="text-right px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400">الوظيفة</th>
-                                        <th className="text-right px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400">الحالة</th>
-                                        <th className="text-right px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400">المتقدمين</th>
-                                        <th className="text-right px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400">التاريخ</th>
-                                        <th className="text-right px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y dark:divide-gray-700">
-                                    {jobs.map((job) => {
-                                        const statusBadge = getStatusBadge(job.status);
-                                        const StatusIcon = statusBadge.icon;
-                                        return (
-                                            <tr key={job._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="font-semibold text-gray-900 dark:text-white">{job.title}</div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{job.location}</div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`badge ${statusBadge.class} flex items-center gap-1 w-fit`}>
-                                                        <StatusIcon className="w-3 h-3" />
-                                                        {statusBadge.label}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="font-semibold text-gray-900 dark:text-white">{job.applicationCount}</span>
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                    {new Date(job.createdAt).toLocaleDateString('ar-EG')}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <Link
-                                                            href={`/company/applicants/${job._id}`}
-                                                            className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                                                            title="المتقدمين"
-                                                        >
-                                                            <Users className="w-4 h-4" />
-                                                        </Link>
-                                                        <Link
-                                                            href={`/jobs/${job._id}`}
-                                                            className="p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                                            title="عرض"
-                                                        >
-                                                            <Eye className="w-4 h-4" />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => deleteJob(job._id)}
-                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                                            title="حذف"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                        <div className="divide-y dark:divide-gray-700">
+                            {/* Desktop View */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
+                                            <th className={`text-${isRtl ? 'right' : 'left'} px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400`}>الوظيفة</th>
+                                            <th className={`text-${isRtl ? 'right' : 'left'} px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400`}>الحالة</th>
+                                            <th className={`text-${isRtl ? 'right' : 'left'} px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400`}>المتقدمين</th>
+                                            <th className={`text-${isRtl ? 'right' : 'left'} px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400`}>التاريخ</th>
+                                            <th className={`text-${isRtl ? 'right' : 'left'} px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400`}>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y dark:divide-gray-700">
+                                        {jobs.map((job) => {
+                                            const statusBadge = getStatusBadge(job.status);
+                                            const StatusIcon = statusBadge.icon;
+                                            return (
+                                                <tr key={job._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <td className="px-6 py-4">
+                                                        <div className="font-semibold text-gray-900 dark:text-white">{job.title}</div>
+                                                        <div className="text-sm text-gray-500 dark:text-gray-400">{job.location}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`badge ${statusBadge.class} flex items-center gap-1 w-fit`}>
+                                                            <StatusIcon className="w-3 h-3" />
+                                                            {statusBadge.label}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span className="font-semibold text-gray-900 dark:text-white">{job.applicationCount}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                                        {new Date(job.createdAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <Link
+                                                                href={`/company/applicants/${job._id}`}
+                                                                className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                                                                title="المتقدمين"
+                                                            >
+                                                                <Users className="w-4 h-4" />
+                                                            </Link>
+                                                            <Link
+                                                                href={`/jobs/${job._id}`}
+                                                                className="p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                                                title="عرض"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => deleteJob(job._id)}
+                                                                className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                                title="حذف"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile View */}
+                            <div className="md:hidden divide-y dark:divide-gray-700">
+                                {jobs.map((job) => {
+                                    const statusBadge = getStatusBadge(job.status);
+                                    const StatusIcon = statusBadge.icon;
+                                    return (
+                                        <div key={job._id} className="p-4 space-y-4">
+                                            <div className={`flex justify-between items-start ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                                <div className={isRtl ? 'text-right' : 'text-left'}>
+                                                    <h3 className="font-bold text-gray-900 dark:text-white">{job.title}</h3>
+                                                    <p className="text-sm text-gray-500">{job.location}</p>
+                                                </div>
+                                                <span className={`badge ${statusBadge.class} flex items-center gap-1`}>
+                                                    <StatusIcon className="w-3 h-3" />
+                                                    {statusBadge.label}
+                                                </span>
+                                            </div>
+                                            <div className={`flex justify-between items-end ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                                <div className={isRtl ? 'text-right' : 'text-left'}>
+                                                    <div className="text-xs text-gray-500 mb-1">المتقدمين: <span className="font-bold text-gray-900 dark:text-white">{job.applicationCount}</span></div>
+                                                    <div className="text-[10px] text-gray-400">{new Date(job.createdAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}</div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Link
+                                                        href={`/company/applicants/${job._id}`}
+                                                        className="btn-secondary-sm p-2"
+                                                    >
+                                                        <Users className="w-4 h-4" />
+                                                    </Link>
+                                                    <Link
+                                                        href={`/jobs/${job._id}`}
+                                                        className="btn-secondary-sm p-2"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => deleteJob(job._id)}
+                                                        className="btn-secondary-sm p-2 text-red-600 border-red-100 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
                 </div>

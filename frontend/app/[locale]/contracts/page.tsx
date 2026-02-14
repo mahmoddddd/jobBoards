@@ -67,7 +67,7 @@ export default function ContractsPage() {
                 <p className={`text-gray-600 dark:text-gray-400 mb-6 ${isRtl ? 'text-right' : 'text-left'}`}>{t('contractsCount', { n: contracts.length })}</p>
 
                 {/* Tabs */}
-                <div className={`flex gap-1 mb-6 bg-white dark:bg-gray-800 rounded-xl p-1 border border-gray-200 dark:border-gray-700 w-fit ${isRtl ? 'flex-row-reverse ml-auto' : 'mr-auto'}`}>
+                <div className={`flex gap-1 mb-6 bg-white dark:bg-gray-800 rounded-xl p-1 border border-gray-200 dark:border-gray-700 w-full md:w-fit overflow-x-auto scrollbar-hide ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}>
                     {[
                         { key: 'ALL', label: t('tabs.all') },
                         { key: 'ACTIVE', label: t('tabs.active') },
@@ -75,7 +75,7 @@ export default function ContractsPage() {
                         { key: 'DISPUTED', label: t('status.DISPUTED') },
                     ].map((tab) => (
                         <button key={tab.key} onClick={() => setFilter(tab.key)}
-                            className={`px-5 py-2 rounded-lg text-sm font-medium transition ${filter === tab.key ? 'bg-primary-600 text-white shadow' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                            className={`px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${filter === tab.key ? 'bg-primary-600 text-white shadow' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}>
                             {tab.label}
                         </button>
@@ -98,35 +98,38 @@ export default function ContractsPage() {
 
                             return (
                                 <Link key={c._id} href={`/contracts/${c._id}`}>
-                                    <div className={`card p-6 card-hover cursor-pointer mb-4 ${isRtl ? 'text-right' : 'text-left'}`}>
-                                        <div className={`flex items-start justify-between mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 dark:text-white text-lg">{c.title}</h3>
-                                                <div className="text-sm text-gray-500 mt-1">
-                                                    {isClient ? t('parties.freelancer') : t('parties.client')}: {otherParty} · {new Date(c.createdAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
+                                    <div className={`card p-5 md:p-6 card-hover cursor-pointer mb-4 ${isRtl ? 'text-right' : 'text-left'}`}>
+                                        <div className={`flex flex-col md:flex-row md:items-start justify-between mb-4 gap-3 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
+                                            <div className="flex-1">
+                                                <h3 className="font-bold text-gray-900 dark:text-white text-base md:text-lg leading-tight">{c.title}</h3>
+                                                <div className="text-xs md:text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-1">
+                                                    <span>{isClient ? t('parties.freelancer') : t('parties.client')}: {otherParty}</span>
+                                                    <span className="hidden xs:inline">·</span>
+                                                    <span>{new Date(c.createdAt).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}</span>
                                                 </div>
                                             </div>
-                                            <div className={isRtl ? 'text-right' : 'text-left'}>
-                                                <div className={`text-lg font-bold text-green-600 flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                                    <DollarSign className="w-5 h-5" /> {c.totalAmount.toLocaleString()}
+                                            <div className={`flex flex-row md:flex-col justify-between items-center md:items-end gap-2 ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
+                                                <div className={`text-base md:text-xl font-bold text-green-600 flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                                    <DollarSign className="w-4 h-4 md:w-5 md:h-5" /> {c.totalAmount.toLocaleString()}
                                                 </div>
-                                                <span className={`badge text-xs mt-1 flex items-center gap-1 ${statusInfo.class} ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                                    <StatusIcon className="w-3 h-3" /> {statusInfo.label}
+                                                <span className={`badge text-[10px] md:text-xs flex items-center gap-1 ${statusInfo.class} ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                                    <StatusIcon className="w-2.5 h-2.5 md:w-3 md:h-3" /> {statusInfo.label}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {/* Progress bar */}
-                                        <div className="mt-3">
-                                            <div className={`flex justify-between text-xs text-gray-500 mb-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                                <span>{t('progress')}</span>
-                                                <span>{c.progress}%</span>
+                                        <div className="mt-4 pt-4 border-t dark:border-gray-700/50">
+                                            <div className={`flex justify-between text-[10px] md:text-xs text-gray-500 mb-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                                <span className="font-medium">{t('progress')}</span>
+                                                <span className="font-bold text-primary-600">{c.progress}%</span>
                                             </div>
-                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                                                <div className={`h-2.5 rounded-full transition-all ${isRtl ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-primary-500 to-secondary-500`}
+                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
+                                                <div className={`h-full rounded-full transition-all duration-500 ${isRtl ? 'bg-gradient-to-l rotate-180' : 'bg-gradient-to-r'} from-primary-500 to-secondary-500`}
                                                     style={{ width: `${c.progress}%` }} />
                                             </div>
-                                            <div className={`text-xs text-gray-500 mt-1 ${isRtl ? 'text-right' : 'text-left'}`}>
+                                            <div className={`text-[10px] md:text-xs text-gray-500 mt-2 flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                                <CheckCircle className="w-3 h-3 text-secondary-500" />
                                                 {t('milestonesCompleted', { completed: c.milestones?.filter(m => ['APPROVED', 'PAID'].includes(m.status)).length, total: c.milestones?.length })}
                                             </div>
                                         </div>

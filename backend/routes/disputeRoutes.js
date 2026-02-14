@@ -7,6 +7,7 @@ router.use(protect);
 
 router
   .route('/')
+  .get(authorize('ADMIN'), disputeController.getAllDisputes)
   .post(disputeController.createDispute);
 
 router

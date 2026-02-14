@@ -137,17 +137,17 @@ export default function FreelancersPage() {
                 </div>
 
                 {/* Search Bar */}
-                <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-8">
-                    <div className="relative">
-                        <Search className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRtl ? 'right-4' : 'left-4'}`} />
+                <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-8 px-2 md:px-0">
+                    <div className="relative group">
+                        <Search className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-500 transition-colors ${isRtl ? 'right-4' : 'left-4'}`} />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder={t('searchPlaceholder')}
-                            className={`input ${isRtl ? 'pr-12 pl-32' : 'pl-12 pr-32'}`}
+                            className={`input h-12 md:h-14 text-sm md:text-base ${isRtl ? 'pr-12 pl-32' : 'pl-12 pr-32'} shadow-soft focus:ring-primary-500/20`}
                         />
-                        <button type="submit" className={`absolute ${isRtl ? 'left-2' : 'right-2'} top-1/2 -translate-y-1/2 btn-primary py-2 px-6 text-sm`}>
+                        <button type="submit" className={`absolute ${isRtl ? 'left-1.5' : 'right-1.5'} top-1/2 -translate-y-1/2 btn-primary py-2 md:py-2.5 px-4 md:px-6 text-xs md:text-sm font-bold shadow-soft`}>
                             {tp('apply')}
                         </button>
                     </div>
@@ -215,20 +215,20 @@ export default function FreelancersPage() {
                 )}
 
                 {/* Categories Quick Filter */}
-                <div className="flex flex-wrap justify-center gap-2 mb-8">
-                    {Object.entries(categoryMap).slice(0, 6).map(([key, val]) => {
+                <div className="flex flex-wrap justify-center gap-2 mb-8 px-2">
+                    {Object.entries(categoryMap).slice(0, 8).map(([key, val]) => {
                         const Icon = val.icon;
                         return (
                             <button
                                 key={key}
                                 onClick={() => { setCategory(category === key ? '' : key); setPage(1); setTimeout(fetchFreelancers, 0); }}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${category === key
-                                    ? 'bg-primary-600 text-white shadow-lg'
-                                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary-500'
+                                className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all ${category === key
+                                    ? 'bg-primary-600 text-white shadow-lg scale-105'
+                                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary-500 hover:bg-gray-50'
                                     }`}
                             >
-                                <Icon className="w-4 h-4" />
-                                {val.label}
+                                <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                <span className="whitespace-nowrap">{val.label}</span>
                             </button>
                         );
                     })}

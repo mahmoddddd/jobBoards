@@ -43,6 +43,7 @@ app.use('/api/contracts', require('./routes/contractRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/portfolio', require('./routes/portfolioRoutes'));
 app.use('/api/disputes', require('./routes/disputeRoutes'));
+app.use('/api/wallet', require('./routes/walletRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

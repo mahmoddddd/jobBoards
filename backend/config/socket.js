@@ -16,12 +16,37 @@ const initSocket = (server) => {
     console.log(`🔌 Socket connected: ${socket.id}`);
 
     // User joins with their userId
+    // User joins with their userId
     socket.on('join', (userId) => {
       if (userId) {
         userSockets.set(userId, socket.id);
         socket.join(`user_${userId}`);
         console.log(`👤 User ${userId} joined`);
       }
+    });
+
+    // Chat events
+    socket.on('join-conversation', (conversationId) => {
+      socket.join(`chat_${conversationId}`);
+      console.log(`💬 Socket ${socket.id} joined chat_${conversationId}`);
+    });
+
+    socket.on('leave-conversation', (conversationId) => {
+      socket.leave(`chat_${conversationId}`);
+    });
+
+    socket.on('typing', (data) => {
+      // data: { conversationId, userId, userName }
+      socket.to(`chat_${data.conversationId}`).emit('typing', data);
+    });
+
+    socket.on('stop-typing', (data) => {
+      socket.to(`chat_${data.conversationId}`).emit('stop-typing', data);
+    });
+
+    socket.on('mark-read', (data) => {
+      // data: { conversationId, readerId }
+      socket.to(`chat_${data.conversationId}`).emit('message-read', data);
     });
 
     // Handle disconnect

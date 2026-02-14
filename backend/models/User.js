@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     ref: 'Company',
     default: null
   },
+  balance: {
+    type: Number,
+    default: 0
+  },
   isActive: {
     type: Boolean,
     default: true

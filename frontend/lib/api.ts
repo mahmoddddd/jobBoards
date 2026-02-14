@@ -122,4 +122,14 @@ export const reviewsAPI = {
     deleteReview: (id: string) => api.delete(`/reviews/${id}`),
 };
 
+// Disputes API
+export const disputesAPI = {
+    getAll: (params?: any) => api.get('/disputes', { params }),
+    getMyDisputes: () => api.get('/disputes/my'),
+    getOne: (id: string) => api.get(`/disputes/${id}`),
+    create: (data: any) => api.post('/disputes', data),
+    addMessage: (id: string, message: string) => api.post(`/disputes/${id}/messages`, { message }),
+    resolve: (id: string, resolution: any) => api.put(`/disputes/${id}/resolve`, resolution),
+};
+
 export default api;
