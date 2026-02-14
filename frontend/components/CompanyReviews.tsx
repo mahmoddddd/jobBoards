@@ -5,8 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { reviewsAPI } from '@/lib/api';
 import { Star, ThumbsUp, ThumbsDown, Loader2, Send, User, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslations, useLocale } from 'next-intl';
 import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { ar, enUS } from 'date-fns/locale';
 
 interface Review {
     _id: string;
@@ -64,6 +65,11 @@ function StarRating({ rating, onRate, interactive = false, size = 'md' }: {
 }
 
 export default function CompanyReviews({ companyId }: Props) {
+    const t = useTranslations('CompanyReviews');
+    const locale = useLocale();
+    const isRtl = locale === 'ar';
+    const dateLocale = isRtl ? ar : enUS;
+
     const { user } = useAuth();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [stats, setStats] = useState<ReviewStats | null>(null);
@@ -99,18 +105,18 @@ export default function CompanyReviews({ companyId }: Props) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (form.rating === 0) {
-            toast.error('يرجى اختيار تقييم');
+            toast.error(t('ratingRequired'));
             return;
         }
         setSubmitting(true);
         try {
             await reviewsAPI.createReview({ companyId, ...form });
-            toast.success('تم إضافة التقييم بنجاح!');
+            toast.success(t('success'));
             setShowForm(false);
             setForm({ rating: 0, title: '', comment: '', pros: '', cons: '', isAnonymous: false });
             fetchReviews();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'حدث خطأ');
+            toast.error(error.response?.data?.message || t('error'));
         } finally {
             setSubmitting(false);
         }
@@ -135,7 +141,7 @@ export default function CompanyReviews({ companyId }: Props) {
                         </div>
                         <StarRating rating={stats?.averageRating || 0} size="lg" />
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                            {stats?.totalReviews || 0} تقييم
+                            {t('reviewsCount', { n: stats?.totalReviews || 0 })}
                         </p>
                     </div>
 
@@ -170,7 +176,7 @@ export default function CompanyReviews({ companyId }: Props) {
                             className="btn-primary"
                         >
                             <Star className="w-4 h-4 ml-2" />
-                            أضف تقييمك
+                            {t('addReview')}
                         </button>
                     </div>
                 )}
@@ -179,46 +185,46 @@ export default function CompanyReviews({ companyId }: Props) {
             {/* Review Form */}
             {showForm && (
                 <div className="card p-6 animate-fade-in">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">أضف تقييمك</h3>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('addReview')}</h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">التقييم</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('rating')}</label>
                             <StarRating rating={form.rating} onRate={r => setForm(p => ({ ...p, rating: r }))} interactive size="lg" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عنوان التقييم</label>
-                            <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} className="input" placeholder="عنوان مختصر لتقييمك" required />
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('reviewTitle')}</label>
+                            <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} className="input" placeholder={t('reviewTitlePlaceholder')} required />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">التعليق</label>
-                            <textarea value={form.comment} onChange={e => setForm(p => ({ ...p, comment: e.target.value }))} className="input min-h-[80px]" placeholder="اكتب تجربتك مع الشركة..." required rows={3} />
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('comment')}</label>
+                            <textarea value={form.comment} onChange={e => setForm(p => ({ ...p, comment: e.target.value }))} className="input min-h-[80px]" placeholder={t('commentPlaceholder')} required rows={3} />
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-green-700 dark:text-green-400 mb-1 flex items-center gap-1">
-                                    <ThumbsUp className="w-4 h-4" /> المميزات
+                                    <ThumbsUp className={`w-4 h-4 ${isRtl ? 'ml-1' : 'mr-1'}`} /> {t('pros')}
                                 </label>
-                                <textarea value={form.pros} onChange={e => setForm(p => ({ ...p, pros: e.target.value }))} className="input min-h-[60px]" placeholder="ما الذي يميز هذه الشركة؟" rows={2} />
+                                <textarea value={form.pros} onChange={e => setForm(p => ({ ...p, pros: e.target.value }))} className="input min-h-[60px]" placeholder={t('prosPlaceholder')} rows={2} />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-red-700 dark:text-red-400 mb-1 flex items-center gap-1">
-                                    <ThumbsDown className="w-4 h-4" /> العيوب
+                                    <ThumbsDown className={`w-4 h-4 ${isRtl ? 'ml-1' : 'mr-1'}`} /> {t('cons')}
                                 </label>
-                                <textarea value={form.cons} onChange={e => setForm(p => ({ ...p, cons: e.target.value }))} className="input min-h-[60px]" placeholder="ما الذي يمكن تحسينه؟" rows={2} />
+                                <textarea value={form.cons} onChange={e => setForm(p => ({ ...p, cons: e.target.value }))} className="input min-h-[60px]" placeholder={t('consPlaceholder')} rows={2} />
                             </div>
                         </div>
                         <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
                             <input type="checkbox" checked={form.isAnonymous} onChange={e => setForm(p => ({ ...p, isAnonymous: e.target.checked }))} className="rounded" />
                             {form.isAnonymous ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            تقييم مجهول
+                            {t('anonymous')}
                         </label>
                         <div className="flex gap-3">
                             <button type="submit" disabled={submitting} className="btn-primary">
-                                {submitting ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Send className="w-4 h-4 ml-2" />}
-                                إرسال التقييم
+                                {submitting ? <Loader2 className={`w-4 h-4 animate-spin ${isRtl ? 'ml-2' : 'mr-2'}`} /> : <Send className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'}`} />}
+                                {t('send')}
                             </button>
                             <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">
-                                إلغاء
+                                {t('cancel')}
                             </button>
                         </div>
                     </form>
@@ -236,10 +242,10 @@ export default function CompanyReviews({ companyId }: Props) {
                                 </div>
                                 <div>
                                     <p className="font-semibold text-gray-900 dark:text-white">
-                                        {review.isAnonymous ? 'مستخدم مجهول' : review.userId?.name}
+                                        {review.isAnonymous ? t('anonymousUser') : review.userId?.name}
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {format(new Date(review.createdAt), 'dd MMMM yyyy', { locale: ar })}
+                                        {format(new Date(review.createdAt), 'dd MMMM yyyy', { locale: dateLocale })}
                                     </p>
                                 </div>
                             </div>
@@ -254,7 +260,7 @@ export default function CompanyReviews({ companyId }: Props) {
                                 {review.pros && (
                                     <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                                         <p className="text-xs font-bold text-green-700 dark:text-green-400 mb-1 flex items-center gap-1">
-                                            <ThumbsUp className="w-3 h-3" /> المميزات
+                                            <ThumbsUp className={`w-3 h-3 ${isRtl ? 'ml-1' : 'mr-1'}`} /> {t('pros')}
                                         </p>
                                         <p className="text-sm text-green-800 dark:text-green-300">{review.pros}</p>
                                     </div>
@@ -262,7 +268,7 @@ export default function CompanyReviews({ companyId }: Props) {
                                 {review.cons && (
                                     <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                                         <p className="text-xs font-bold text-red-700 dark:text-red-400 mb-1 flex items-center gap-1">
-                                            <ThumbsDown className="w-3 h-3" /> العيوب
+                                            <ThumbsDown className={`w-3 h-3 ${isRtl ? 'ml-1' : 'mr-1'}`} /> {t('cons')}
                                         </p>
                                         <p className="text-sm text-red-800 dark:text-red-300">{review.cons}</p>
                                     </div>
@@ -275,8 +281,8 @@ export default function CompanyReviews({ companyId }: Props) {
                 {reviews.length === 0 && (
                     <div className="text-center py-12">
                         <Star className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                        <p className="text-gray-500 dark:text-gray-400">لا توجد تقييمات بعد</p>
-                        <p className="text-sm text-gray-400 dark:text-gray-500">كن أول من يقيّم هذه الشركة</p>
+                        <p className="text-gray-500 dark:text-gray-400">{t('noReviews')}</p>
+                        <p className="text-sm text-gray-400 dark:text-gray-500">{t('beFirst')}</p>
                     </div>
                 )}
             </div>

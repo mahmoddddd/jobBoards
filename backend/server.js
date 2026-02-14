@@ -36,6 +36,11 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/company', require('./routes/companyChartsRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/freelancers', require('./routes/freelancerRoutes'));
+app.use('/api/projects', require('./routes/projectRoutes'));
+app.use('/api/proposals', require('./routes/proposalRoutes'));
+app.use('/api/contracts', require('./routes/contractRoutes'));
+app.use('/api/messages', require('./routes/messageRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

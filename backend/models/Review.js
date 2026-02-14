@@ -1,41 +1,47 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
+  // Target of the review (Company OR Freelancer)
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Company',
-    required: true
+    ref: 'Company'
   },
+  freelancerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+
+  // Reviewer
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
+
+  // Context (for freelancers)
+  contractId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Contract'
+  },
+
   rating: {
     type: Number,
     required: [true, 'التقييم مطلوب'],
-    min: [1, 'التقييم يجب أن يكون 1 على الأقل'],
-    max: [5, 'التقييم يجب أن يكون 5 كحد أقصى']
+    min: 1,
+    max: 5
   },
   title: {
     type: String,
-    required: [true, 'عنوان التقييم مطلوب'],
     trim: true,
-    maxlength: [100, 'العنوان يجب أن يكون أقل من 100 حرف']
+    maxlength: 100
   },
   comment: {
     type: String,
-    required: [true, 'تعليق التقييم مطلوب'],
-    maxlength: [1000, 'التعليق يجب أن يكون أقل من 1000 حرف']
+    required: [true, 'التعليق مطلوب'],
+    maxlength: 1000
   },
-  pros: {
-    type: String,
-    maxlength: [500, 'المميزات يجب أن تكون أقل من 500 حرف']
-  },
-  cons: {
-    type: String,
-    maxlength: [500, 'العيوب يجب أن تكون أقل من 500 حرف']
-  },
+  pros: String, // Kept for backward compat with company reviews
+  cons: String, // Kept for backward compat with company reviews
   isAnonymous: {
     type: Boolean,
     default: false
@@ -44,25 +50,49 @@ const reviewSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Prevent duplicate reviews: one review per user per company
-reviewSchema.index({ companyId: 1, userId: 1 }, { unique: true });
+// Ensure either companyId or freelancerId is present, but not both (conceptually)
+// Validator could be added, but logic in controller is usually enough.
 
-// Static method to get average rating
-reviewSchema.statics.getAverageRating = async function(companyId) {
+// Indexes
+reviewSchema.index({ companyId: 1, userId: 1 }, { unique: true, partialFilterExpression: { companyId: { $exists: true } } });
+reviewSchema.index({ contractId: 1, userId: 1 }, { unique: true, partialFilterExpression: { contractId: { $exists: true } } });
+reviewSchema.index({ freelancerId: 1 });
+
+// Static method to calculate avg rating for Company
+reviewSchema.statics.getCompanyAverage = async function(companyId) {
   const result = await this.aggregate([
-    { $match: { companyId: companyId } },
-    {
-      $group: {
-        _id: '$companyId',
-        averageRating: { $avg: '$rating' },
-        totalReviews: { $sum: 1 }
-      }
-    }
+    { $match: { companyId: new mongoose.Types.ObjectId(companyId) } },
+    { $group: { _id: '$companyId', avgAttributes: { $avg: '$rating' }, count: { $sum: 1 } } }
   ]);
-
-  return result.length > 0
-    ? { averageRating: Math.round(result[0].averageRating * 10) / 10, totalReviews: result[0].totalReviews }
-    : { averageRating: 0, totalReviews: 0 };
+  return result[0] || { avgAttributes: 0, count: 0 };
 };
+
+// Static method to calculate avg rating for Freelancer
+reviewSchema.statics.getFreelancerAverage = async function(freelancerId) {
+  const result = await this.aggregate([
+    { $match: { freelancerId: new mongoose.Types.ObjectId(freelancerId) } },
+    { $group: { _id: '$freelancerId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+  ]);
+  return result[0] || { avgRating: 0, count: 0 };
+};
+
+// Post-save hook to update aggregates
+reviewSchema.post('save', async function() {
+  if (this.companyId) {
+    // Update Company aggregation (if Company model supports it)
+    // For now assuming existing logic handles this or will be updated
+  }
+
+  if (this.freelancerId) {
+    const stats = await this.constructor.getFreelancerAverage(this.freelancerId);
+    await mongoose.model('FreelancerProfile').findOneAndUpdate(
+      { userId: this.freelancerId },
+      {
+        rating: Math.round(stats.avgRating * 10) / 10,
+        reviewCount: stats.count
+      }
+    );
+  }
+});
 
 module.exports = mongoose.model('Review', reviewSchema);

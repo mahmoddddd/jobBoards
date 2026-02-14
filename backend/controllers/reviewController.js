@@ -1,89 +1,81 @@
 const Review = require('../models/Review');
 const Company = require('../models/Company');
+const Contract = require('../models/Contract');
+const FreelancerProfile = require('../models/FreelancerProfile');
 
 // @desc    Get reviews for a company
 // @route   GET /api/reviews/company/:companyId
 // @access  Public
 exports.getCompanyReviews = async (req, res) => {
   try {
-    const { companyId } = req.params;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const reviews = await Review.find({ companyId })
+    const reviews = await Review.find({ companyId: req.params.companyId })
       .populate('userId', 'name avatar')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .sort({ createdAt: -1 });
 
-    const total = await Review.countDocuments({ companyId });
-    const stats = await Review.getAverageRating(require('mongoose').Types.ObjectId.createFromHexString(companyId));
-
-    // Rating distribution
-    const distribution = await Review.aggregate([
-      { $match: { companyId: require('mongoose').Types.ObjectId.createFromHexString(companyId) } },
-      { $group: { _id: '$rating', count: { $sum: 1 } } },
-      { $sort: { _id: -1 } }
-    ]);
-
-    const ratingDistribution = {};
-    for (let i = 1; i <= 5; i++) {
-      const found = distribution.find(d => d._id === i);
-      ratingDistribution[i] = found ? found.count : 0;
-    }
-
-    res.json({
-      success: true,
-      reviews,
-      stats: {
-        ...stats,
-        ratingDistribution
-      },
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    });
+    res.json({ success: true, count: reviews.length, reviews });
   } catch (error) {
-    console.error('Get reviews error:', error);
-    res.status(500).json({ success: false, message: 'حدث خطأ', error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// @desc    Create review
+// @desc    Get reviews for a freelancer
+// @route   GET /api/reviews/freelancer/:freelancerId
+// @access  Public
+exports.getFreelancerReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find({ freelancerId: req.params.freelancerId })
+      .populate('userId', 'name avatar') // Reviewer info
+      .populate('contractId', 'title')   // Project context
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, count: reviews.length, reviews });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// @desc    Create a review (Company or Freelancer)
 // @route   POST /api/reviews
-// @access  Private (USER only)
+// @access  Private
 exports.createReview = async (req, res) => {
   try {
-    const { companyId, rating, title, comment, pros, cons, isAnonymous } = req.body;
+    const {
+      companyId, freelancerId, contractId, // Targets
+      rating, title, comment, pros, cons, isAnonymous
+    } = req.body;
 
-    // Check company exists
-    const company = await Company.findById(companyId);
-    if (!company) {
-      return res.status(404).json({ success: false, message: 'الشركة غير موجودة' });
+    const reviewData = {
+      userId: req.user.id,
+      rating, title, comment, pros, cons, isAnonymous
+    };
+
+    // Case 1: Freelancer Review (Contract-based)
+    if (contractId && freelancerId) {
+        // Verify contract
+        const contract = await Contract.findById(contractId);
+        if (!contract) return res.status(404).json({ success: false, message: 'العقد غير موجود' });
+
+        // Ensure reviewer is the client
+        if (contract.clientId.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'غير مصرح لك بتقييم هذا العقد' });
+        }
+        // Ensure contract is completed
+        if (contract.status !== 'COMPLETED') {
+            return res.status(400).json({ success: false, message: 'يجب أن يكون العقد مكتملاً للتقييم' });
+        }
+
+        reviewData.freelancerId = freelancerId;
+        reviewData.contractId = contractId;
+    }
+    // Case 2: Company Review (Legacy/Existing)
+    else if (companyId) {
+        reviewData.companyId = companyId;
+    }
+    else {
+        return res.status(400).json({ success: false, message: 'وجهة التقييم غير محددة' });
     }
 
-    // Check if user already reviewed this company
-    const existingReview = await Review.findOne({ companyId, userId: req.user._id });
-    if (existingReview) {
-      return res.status(400).json({ success: false, message: 'لقد قمت بتقييم هذه الشركة مسبقاً' });
-    }
-
-    const review = await Review.create({
-      companyId,
-      userId: req.user._id,
-      rating,
-      title,
-      comment,
-      pros,
-      cons,
-      isAnonymous
-    });
-
-    await review.populate('userId', 'name avatar');
+    const review = await Review.create(reviewData);
 
     res.status(201).json({
       success: true,
@@ -91,61 +83,64 @@ exports.createReview = async (req, res) => {
       review
     });
   } catch (error) {
-    console.error('Create review error:', error);
     if (error.code === 11000) {
-      return res.status(400).json({ success: false, message: 'لقد قمت بتقييم هذه الشركة مسبقاً' });
+        return res.status(400).json({ success: false, message: 'لقد قمت بتقييم هذا العنصر مسبقاً' });
     }
-    res.status(500).json({ success: false, message: 'حدث خطأ', error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
 // @desc    Update review
 // @route   PUT /api/reviews/:id
-// @access  Private (Review owner)
+// @access  Private
 exports.updateReview = async (req, res) => {
   try {
     let review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ success: false, message: 'التقييم غير موجود' });
 
-    if (!review) {
-      return res.status(404).json({ success: false, message: 'التقييم غير موجود' });
+    if (review.userId.toString() !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ success: false, message: 'غير مصرح لك' });
     }
 
-    if (review.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: 'غير مصرح لك بتعديل هذا التقييم' });
-    }
+    review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
 
-    const { rating, title, comment, pros, cons, isAnonymous } = req.body;
-    review = await Review.findByIdAndUpdate(
-      req.params.id,
-      { rating, title, comment, pros, cons, isAnonymous },
-      { new: true, runValidators: true }
-    ).populate('userId', 'name avatar');
+    // Trigger save to re-calculate averages
+    await review.save();
 
-    res.json({ success: true, message: 'تم تحديث التقييم', review });
+    res.json({ success: true, review });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'حدث خطأ', error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
 // @desc    Delete review
 // @route   DELETE /api/reviews/:id
-// @access  Private (Review owner or Admin)
+// @access  Private
 exports.deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ success: false, message: 'التقييم غير موجود' });
 
-    if (!review) {
-      return res.status(404).json({ success: false, message: 'التقييم غير موجود' });
+    if (review.userId.toString() !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ success: false, message: 'غير مصرح لك' });
     }
 
-    if (review.userId.toString() !== req.user._id.toString() && req.user.role !== 'ADMIN') {
-      return res.status(403).json({ success: false, message: 'غير مصرح لك بحذف هذا التقييم' });
-    }
+    await review.deleteOne(); // Will trigger potential cleanup/re-calc if hooks set on remove
 
-    await review.deleteOne();
+    // Manually trigger re-calc if needed (Mongoose middleware for 'deleteOne' on doc is tricky sometimes)
+    if (review.freelancerId) {
+         const stats = await Review.getFreelancerAverage(review.freelancerId);
+         await FreelancerProfile.findOneAndUpdate(
+           { userId: review.freelancerId },
+           { rating: Math.round(stats.avgRating * 10) / 10, reviewCount: stats.count }
+         );
+    }
 
     res.json({ success: true, message: 'تم حذف التقييم' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'حدث خطأ', error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };

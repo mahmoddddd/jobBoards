@@ -1,18 +1,35 @@
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+
+const publicPages = ['/login', '/register', '/forgot-password', '/reset-password', '/jobs', '/projects', '/freelancers', '/companies', '/about', '/', '/privacy'];
+
+const intlMiddleware = createMiddleware(routing);
+
 // Routes that require authentication
-const protectedRoutes = ['/profile', '/applications', '/saved-jobs'];
+const protectedRoutes = ['/profile', '/applications', '/saved-jobs', '/contracts', '/messages', '/freelancer'];
 const companyRoutes = ['/company'];
 const adminRoutes = ['/admin'];
 const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 
-export function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
-    const token = request.cookies.get('token')?.value;
-    const userCookie = request.cookies.get('user')?.value;
+export default function middleware(req: NextRequest) {
+    const { pathname } = req.nextUrl;
 
+    // Exclude API and internal paths
+    if (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')) {
+        return NextResponse.next();
+    }
+
+    // 1. Run intl middleware first
+    const response = intlMiddleware(req);
+
+    // 2. Auth Logic
+    const token = req.cookies.get('token')?.value;
+    const userCookie = req.cookies.get('user')?.value;
     let user: { role?: string } | null = null;
+
     try {
         if (userCookie) {
             user = JSON.parse(userCookie);
@@ -21,58 +38,72 @@ export function middleware(request: NextRequest) {
         // Invalid cookie
     }
 
-    // Redirect authenticated users away from auth pages
-    if (authRoutes.some(route => pathname.startsWith(route)) && token && user) {
-        if (user.role === 'ADMIN') {
-            return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-        } else if (user.role === 'COMPANY') {
-            return NextResponse.redirect(new URL('/company/dashboard', request.url));
-        }
-        return NextResponse.redirect(new URL('/jobs', request.url));
+    // Extract locale and path logic
+    const pathnameHasLocale = routing.locales.some(
+        (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    );
+
+    if (!pathnameHasLocale) {
+        // Let intlMiddleware handle redirect to default locale
+        return response;
     }
 
-    // Check protected routes
-    if (protectedRoutes.some(route => pathname.startsWith(route))) {
-        if (!token) {
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', pathname);
-            return NextResponse.redirect(loginUrl);
-        }
-    }
+    // Parse the path to get locale and clean path
+    // e.g. /ar/admin -> locale: ar, cleanPath: /admin
+    const segments = pathname.split('/');
+    const locale = segments[1]; // 'ar' or 'en'
+    const cleanPath = '/' + segments.slice(2).join('/') || '/'; // Handle root /ar -> /
 
-    // Check company routes
-    if (companyRoutes.some(route => pathname.startsWith(route))) {
-        if (!token) {
-            return NextResponse.redirect(new URL('/login', request.url));
-        }
-        if (user && user.role !== 'COMPANY' && user.role !== 'ADMIN') {
-            return NextResponse.redirect(new URL('/', request.url));
-        }
-    }
+    // --- Access Control Checks ---
 
-    // Check admin routes
-    if (adminRoutes.some(route => pathname.startsWith(route))) {
+    // Admin Routes
+    if (cleanPath.startsWith('/admin')) {
         if (!token) {
-            return NextResponse.redirect(new URL('/login', request.url));
+            const url = new URL(`/${locale}/login`, req.url);
+            url.searchParams.set('redirect', cleanPath);
+            return NextResponse.redirect(url);
         }
         if (user && user.role !== 'ADMIN') {
-            return NextResponse.redirect(new URL('/', request.url));
+            return NextResponse.redirect(new URL(`/${locale}/`, req.url));
         }
     }
 
-    return NextResponse.next();
+    // Company Routes
+    if (cleanPath.startsWith('/company')) {
+        if (!token) {
+            const url = new URL(`/${locale}/login`, req.url);
+            url.searchParams.set('redirect', cleanPath);
+            return NextResponse.redirect(url);
+        }
+        if (user && user.role !== 'COMPANY' && user.role !== 'ADMIN') {
+            return NextResponse.redirect(new URL(`/${locale}/`, req.url));
+        }
+    }
+
+    // Protected General Routes
+    const isProtected = protectedRoutes.some(route => cleanPath.startsWith(route));
+    if (isProtected) {
+        if (!token) {
+            const url = new URL(`/${locale}/login`, req.url);
+            url.searchParams.set('redirect', cleanPath);
+            return NextResponse.redirect(url);
+        }
+    }
+
+    // Redirect Logged-in Users from Auth Pages
+    const isAuthPage = authRoutes.some(route => cleanPath === route || cleanPath.startsWith(route + '/'));
+    if (isAuthPage && token && user) {
+        if (user.role === 'ADMIN') {
+            return NextResponse.redirect(new URL(`/${locale}/admin/dashboard`, req.url));
+        } else if (user.role === 'COMPANY') {
+            return NextResponse.redirect(new URL(`/${locale}/company/dashboard`, req.url));
+        }
+        return NextResponse.redirect(new URL(`/${locale}/jobs`, req.url));
+    }
+
+    return response;
 }
 
 export const config = {
-    matcher: [
-        '/profile/:path*',
-        '/applications/:path*',
-        '/saved-jobs/:path*',
-        '/company/:path*',
-        '/admin/:path*',
-        '/login',
-        '/register',
-        '/forgot-password',
-        '/reset-password',
-    ],
+    matcher: ['/((?!api|_next|.*\\..*).*)']
 };

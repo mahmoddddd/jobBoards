@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
@@ -10,31 +10,38 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType>({ socket: null });
 
-let socket: Socket | null = null;
-
 export function SocketProvider({ children }: { children: ReactNode }) {
     const { user, token } = useAuth();
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
         if (user && token) {
             // Connect to socket server
-            socket = io(process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000', {
+            const newSocket = io(process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000', {
                 withCredentials: true,
+                query: { token: token } // improved authentication passing
             });
 
-            socket.on('connect', () => {
-                console.log('🔌 Socket connected');
-                socket?.emit('join', user.id);
+            newSocket.on('connect', () => {
+                console.log('🔌 Socket connected:', newSocket.id);
+                newSocket.emit('join', user.id);
             });
 
-            socket.on('disconnect', () => {
+            newSocket.on('disconnect', () => {
                 console.log('❌ Socket disconnected');
             });
 
+            setSocket(newSocket);
+
             return () => {
-                socket?.disconnect();
-                socket = null;
+                newSocket.disconnect();
+                setSocket(null);
             };
+        } else {
+            if (socket) {
+                socket.disconnect();
+                setSocket(null);
+            }
         }
     }, [user, token]);
 

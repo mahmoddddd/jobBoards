@@ -1,7 +1,11 @@
-import Link from 'next/link';
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { Link } from '@/navigation';
 import { Briefcase, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 export default function Footer() {
+    const t = useTranslations('Footer');
     const currentYear = new Date().getFullYear();
 
     return (
@@ -17,7 +21,7 @@ export default function Footer() {
                             <span className="text-xl font-bold text-white">JobBoard</span>
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                            منصة التوظيف الرائدة في المنطقة. نربط الباحثين عن عمل بأفضل الفرص الوظيفية.
+                            {t('description')}
                         </p>
                         <div className="flex gap-4">
                             <a href="#" className="text-gray-400 hover:text-primary-400 transition">
@@ -37,26 +41,26 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-white mb-4">روابط سريعة</h4>
+                        <h4 className="font-semibold text-white mb-4">{t('quickLinks')}</h4>
                         <ul className="space-y-2">
                             <li>
                                 <Link href="/jobs" className="text-gray-400 hover:text-primary-400 transition">
-                                    تصفح الوظائف
+                                    {t('browseJobs')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/projects" className="text-gray-400 hover:text-primary-400 transition">
+                                    {t('browseProjects')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/freelancers" className="text-gray-400 hover:text-primary-400 transition">
+                                    {t('freelancers')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/companies" className="text-gray-400 hover:text-primary-400 transition">
-                                    الشركات
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/register" className="text-gray-400 hover:text-primary-400 transition">
-                                    إنشاء حساب
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/resume-builder" className="text-gray-400 hover:text-primary-400 transition">
-                                    بناء السيرة الذاتية
+                                    {t('companies')}
                                 </Link>
                             </li>
                         </ul>
@@ -64,38 +68,43 @@ export default function Footer() {
 
                     {/* For Companies */}
                     <div>
-                        <h4 className="font-semibold text-white mb-4">للشركات</h4>
+                        <h4 className="font-semibold text-white mb-4">{t('forCompanies')}</h4>
                         <ul className="space-y-2">
                             <li>
                                 <Link href="/register?type=company" className="text-gray-400 hover:text-primary-400 transition">
-                                    نشر وظيفة
+                                    {t('postJob')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/projects/new" className="text-gray-400 hover:text-primary-400 transition">
+                                    {t('postProject')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/company/dashboard" className="text-gray-400 hover:text-primary-400 transition">
-                                    لوحة التحكم
+                                    {t('dashboard')}
                                 </Link>
                             </li>
                             <li>
-                                <a href="#" className="text-gray-400 hover:text-primary-400 transition">
-                                    باقات الأسعار
-                                </a>
+                                <Link href="/pricing" className="text-gray-400 hover:text-primary-400 transition">
+                                    {t('pricing')}
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="text-gray-400 hover:text-primary-400 transition">
-                                    الدعم الفني
-                                </a>
+                                <Link href="/support" className="text-gray-400 hover:text-primary-400 transition">
+                                    {t('support')}
+                                </Link>
                             </li>
                         </ul>
                     </div>
 
                     {/* Contact */}
                     <div>
-                        <h4 className="font-semibold text-white mb-4">تواصل معنا</h4>
+                        <h4 className="font-semibold text-white mb-4">{t('contactUs')}</h4>
                         <ul className="space-y-3">
                             <li className="flex items-center gap-3 text-gray-400">
                                 <MapPin className="w-5 h-5 text-primary-400" />
-                                <span>القاهرة، مصر</span>
+                                <span>{t('location')}</span>
                             </li>
                             <li className="flex items-center gap-3 text-gray-400">
                                 <Phone className="w-5 h-5 text-primary-400" />
@@ -112,18 +121,18 @@ export default function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-gray-500 text-sm">
-                        © {currentYear} JobBoard. جميع الحقوق محفوظة.
+                        © {currentYear} JobBoard. {t('copyright')}
                     </p>
                     <div className="flex gap-6 text-sm">
-                        <a href="#" className="text-gray-400 hover:text-primary-400 transition">
-                            سياسة الخصوصية
-                        </a>
-                        <a href="#" className="text-gray-400 hover:text-primary-400 transition">
-                            شروط الاستخدام
-                        </a>
-                        <a href="#" className="text-gray-400 hover:text-primary-400 transition">
-                            الأسئلة الشائعة
-                        </a>
+                        <Link href="/privacy" className="text-gray-400 hover:text-primary-400 transition">
+                            {t('privacy')}
+                        </Link>
+                        <Link href="/terms" className="text-gray-400 hover:text-primary-400 transition">
+                            {t('terms')}
+                        </Link>
+                        <Link href="/faq" className="text-gray-400 hover:text-primary-400 transition">
+                            {t('faq')}
+                        </Link>
                     </div>
                 </div>
             </div>

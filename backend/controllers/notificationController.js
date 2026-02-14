@@ -1,59 +1,82 @@
 const Notification = require('../models/Notification');
+const ErrorResponse = require('../utils/errorResponse');
 
-exports.getNotifications = async (req, res) => {
+// @desc    Get all notifications for logged-in user
+// @route   GET /api/notifications
+// @access  Private
+exports.getNotifications = async (req, res, next) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
-    // Using req.user._id assumes the auth middleware attaches the user object as req.user
-    const notifications = await Notification.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(limit);
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const startIndex = (page - 1) * limit;
 
-    const unreadCount = await Notification.countDocuments({ userId: req.user._id, isRead: false });
+    const total = await Notification.countDocuments({ userId: req.user.id });
+
+    const notifications = await Notification.find({ userId: req.user.id })
+      .sort({ createdAt: -1 })
+      .skip(startIndex)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
       count: notifications.length,
-      unreadCount,
-      notifications
+      pagination: {
+        page,
+        limit,
+        total,
+        hasMore: startIndex + notifications.length < total
+      },
+      data: notifications
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Server Error',
-      error: error.message
-    });
+    next(error);
   }
 };
 
-exports.markAsRead = async (req, res) => {
+// @desc    Mark notification as read
+// @route   PUT /api/notifications/:id/read
+// @access  Private
+exports.markAsRead = async (req, res, next) => {
   try {
-    const notification = await Notification.findOne({ _id: req.params.id, userId: req.user._id });
+    let notification = await Notification.findById(req.params.id);
 
     if (!notification) {
-      return res.status(404).json({ success: false, message: 'Notification not found' });
+      return next(new ErrorResponse('الإشعار غير موجود', 404));
+    }
+
+    // Check ownership
+    // Note: ensure user.id is string or use .equals()
+    if (notification.userId.toString() !== req.user.id) {
+      return next(new ErrorResponse('غير مصرح لك', 401));
     }
 
     notification.isRead = true;
     await notification.save();
 
-    res.status(200).json({ success: true, data: notification });
+    res.status(200).json({
+      success: true,
+      data: notification
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    next(error);
   }
 };
 
-exports.markAllAsRead = async (req, res) => {
+// @desc    Mark all notifications as read
+// @route   PUT /api/notifications/read-all
+// @access  Private
+exports.markAllAsRead = async (req, res, next) => {
   try {
     await Notification.updateMany(
-      { userId: req.user._id, isRead: false },
+      { userId: req.user.id, isRead: false },
       { $set: { isRead: true } }
     );
 
-    res.status(200).json({ success: true, message: 'All notifications marked as read' });
+    res.status(200).json({
+      success: true,
+      message: 'تم تحديث جميع الإشعارات كمقروءة'
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    next(error);
   }
 };
