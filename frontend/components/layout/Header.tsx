@@ -71,10 +71,10 @@ export default function Header() {
     const logoBrandClass = 'text-primary-600 dark:text-primary-400';
 
     return (
-        <header className="fixed w-full top-0 z-50 py-4 px-4 transition-all duration-300 pointer-events-none">
-            <div className={`container max-w-5xl mx-auto px-6 rounded-2xl transition-all duration-300 pointer-events-auto ${scrolled
+        <header className="absolute md:fixed w-full top-0 z-50 py-2 md:py-4 px-2 md:px-4 transition-all duration-300 pointer-events-none">
+            <div className={`container max-w-5xl mx-auto px-4 md:px-6 rounded-xl md:rounded-2xl transition-all duration-300 pointer-events-auto ${scrolled
                 ? 'bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-lg py-2'
-                : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3'
+                : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-2 md:py-3'
                 }`}>
                 <div className="flex items-center justify-between">
                     {/* Logo */}
@@ -259,21 +259,21 @@ export default function Header() {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <div className="md:hidden flex items-center gap-2">
+                    <div className="md:hidden flex items-center gap-1.5">
                         {/* Mobile Lang Switcher */}
                         <LanguageSwitcher />
 
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-yellow-400 transition-colors"
+                            className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-yellow-400 transition-colors"
                         >
-                            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                         </button>
                         <button
-                            className="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 transition-colors"
+                            className="p-1.5 text-gray-600 dark:text-gray-300 hover:text-primary-600 transition-colors"
                             onClick={() => setIsOpen(!isOpen)}
                         >
-                            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                         </button>
                     </div>
                 </div>
@@ -282,8 +282,7 @@ export default function Header() {
             {/* Mobile Menu */}
             {/* Note: I reused Link in Mobile Menu too to ensure consistency */}
             {isOpen && (
-                <div className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 animate-fade-in pointer-events-auto">
-                    {/* ... Same content utilizing Link ... */}
+                <div className="md:hidden absolute top-full left-2 right-2 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 animate-fade-in pointer-events-auto max-h-[calc(100vh-100px)] overflow-y-auto shadow-primary-500/10">
                     <div className="p-4 space-y-2">
                         <Link href="/jobs" className="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-gray-700 dark:text-gray-300">{t('jobs')}</Link>
                         <Link href="/projects" className="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-gray-700 dark:text-gray-300">{t('projects')}</Link>
