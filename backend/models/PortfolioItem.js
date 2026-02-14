@@ -14,8 +14,7 @@ const portfolioItemSchema = new mongoose.Schema({
     maxlength: [100, 'العنوان يجب أن يكون أقل من 100 حرف']
   },
   slug: {
-    type: String,
-    unique: true
+    type: String
   },
   description: {
     type: String,
