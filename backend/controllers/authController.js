@@ -62,6 +62,78 @@ exports.register = async (req, res) => {
   }
 };
 
+// @desc    Google Login
+// @route   POST /api/auth/google
+// @access  Public
+exports.googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    });
+    const { name, email, picture, sub: googleId } = ticket.getPayload();
+
+    // Check if user exists
+    let user = await User.findOne({ $or: [{ email }, { googleId }] });
+
+    if (user) {
+      // Update googleId if not present (linking account)
+      if (!user.googleId) {
+        user.googleId = googleId;
+        if (!user.avatar) user.avatar = picture;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        avatar: picture,
+        role: 'USER', // Default role
+        isActive: true
+      });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'هذا الحساب موقوف'
+      });
+    }
+
+    // Generate token
+    const jwtToken = user.generateToken();
+
+    res.json({
+      success: true,
+      message: 'تم تسجيل الدخول بنجاح',
+      token: jwtToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId,
+        avatar: user.avatar
+      }
+    });
+
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'فشل تسجيل الدخول بواسطة جوجل',
+      error: error.message
+    });
+  }
+};
+
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public

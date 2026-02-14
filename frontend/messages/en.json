@@ -177,6 +177,8 @@
     "Auth": {
         "loginTitle": "Login",
         "loginSubtitle": "Welcome back! Sign in to continue",
+        "googleLogin": "Sign in with Google",
+        "or": "Or continue with",
         "registerTitle": "Create New Account",
         "registerSubtitle": "Join thousands of job seekers and companies",
         "email": "Email Address",

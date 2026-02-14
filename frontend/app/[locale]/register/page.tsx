@@ -11,12 +11,14 @@ import { useAuth } from '@/context/AuthContext';
 import { Briefcase, Mail, Lock, User, Building2, Loader2, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { GoogleLogin } from '@react-oauth/google';
+
 // Schemas moved inside component
 
 export default function RegisterPage() {
     const t = useTranslations('Auth');
     const tc = useTranslations('Common');
-    const { register: registerUser } = useAuth();
+    const { register: registerUser, googleLogin } = useAuth();
     const searchParams = useSearchParams();
     const [accountType, setAccountType] = useState<'user' | 'freelancer' | 'company'>(
         searchParams.get('type') === 'company' ? 'company' : searchParams.get('type') === 'freelancer' ? 'freelancer' : 'user'
@@ -278,6 +280,41 @@ export default function RegisterPage() {
                             )}
                         </button>
                     </form>
+
+                    <div className="relative mt-8 mb-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-gray-200" />
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500 bg-opacity-100">{t('or')}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center">
+                        <GoogleLogin
+                            onSuccess={async (credentialResponse) => {
+                                if (credentialResponse.credential) {
+                                    setLoading(true);
+                                    try {
+                                        await googleLogin(credentialResponse.credential);
+                                        toast.success(tc('success'));
+                                    } catch (error: any) {
+                                        toast.error(error.response?.data?.message || tc('error'));
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }
+                            }}
+                            onError={() => {
+                                toast.error('Google Login Failed');
+                            }}
+                            text="signup_with"
+                            useOneTap
+                            containerProps={{
+                                className: 'w-full flex justify-center !w-full'
+                            }}
+                        />
+                    </div>
 
                     <p className="text-center mt-6 text-gray-600">
                         {t('haveAccount')}{' '}

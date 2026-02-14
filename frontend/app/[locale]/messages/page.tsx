@@ -146,7 +146,7 @@ export default function MessagesPage() {
     const fetchConversations = async () => {
         try {
             const res = await api.get('/messages/conversations');
-            setConversations(res.data.conversations);
+            setConversations(res.data.conversations || []);
         } catch (error) {
             console.error(error);
         } finally {

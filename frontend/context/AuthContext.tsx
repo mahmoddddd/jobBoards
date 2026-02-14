@@ -5,6 +5,8 @@ import Cookies from 'js-cookie';
 import { authAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 interface User {
     id: string;
     name: string;
@@ -20,6 +22,7 @@ interface AuthContextType {
     token: string | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
+    googleLogin: (token: string) => Promise<void>;
     register: (data: any) => Promise<void>;
     logout: () => void;
     updateUser: (data: Partial<User>) => void;
@@ -101,10 +104,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const googleLogin = async (tokenData: string) => {
+        const response = await authAPI.googleLogin(tokenData);
+        // Assuming the API returns similar structure to normal login
+        const { token: newToken, user: newUser } = response.data;
+
+        setToken(newToken);
+        setUser(newUser);
+
+        Cookies.set('token', newToken, { expires: 7 });
+        Cookies.set('user', JSON.stringify(newUser), { expires: 7 });
+
+        if (newUser.role === 'ADMIN') {
+            router.push('/admin/dashboard');
+        } else if (newUser.role === 'COMPANY') {
+            router.push('/company/dashboard');
+        } else {
+            router.push('/jobs');
+        }
+    };
+
+    console.log('Google Client ID:', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
-            {children}
-        </AuthContext.Provider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+            <AuthContext.Provider value={{ user, token, loading, login, googleLogin, register, logout, updateUser }}>
+                {children}
+            </AuthContext.Provider>
+        </GoogleOAuthProvider>
     );
 }
 

@@ -16,10 +16,18 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (user && token) {
-            // Connect to socket server
-            const newSocket = io(process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000', {
+            // Determine socket URL - prefer localhost if running locally
+            const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const socketUrl = isLocal
+                ? 'http://localhost:5000'
+                : (process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000');
+
+            console.log('🔌 Connecting to socket:', socketUrl);
+
+            const newSocket = io(socketUrl, {
                 withCredentials: true,
-                query: { token: token } // improved authentication passing
+                transports: ['websocket', 'polling'], // force websocket first for better performance
+                query: { token: token }
             });
 
             newSocket.on('connect', () => {
