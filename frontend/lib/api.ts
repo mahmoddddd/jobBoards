@@ -133,4 +133,49 @@ export const disputesAPI = {
     resolve: (id: string, resolution: any) => api.put(`/disputes/${id}/resolve`, resolution),
 };
 
+// Skill Tests API
+export const skillTestsAPI = {
+    getAll: () => api.get('/skill-tests'),
+    getOne: (id: string) => api.get(`/skill-tests/${id}`),
+    submit: (id: string, answers: number[]) => api.post(`/skill-tests/${id}/submit`, { answers }),
+};
+
+// Interview API
+export const interviewsAPI = {
+    schedule: (data: any) => api.post('/interviews', data),
+    getAll: () => api.get('/interviews'),
+    update: (id: string, data: any) => api.put(`/interviews/${id}`, data),
+};
+
+// Proposals API
+export const proposalsAPI = {
+    submit: (data: any) => api.post('/proposals', data),
+    getMyProposals: () => api.get('/proposals/my-proposals'),
+    getProjectProposals: (projectId: string) => api.get(`/proposals/project/${projectId}`),
+    updateStatus: (id: string, status: string) => api.put(`/proposals/${id}/status`, { status }),
+    withdraw: (id: string) => api.delete(`/proposals/${id}`),
+};
+
+// Freelancers API
+export const freelancersAPI = {
+    getMyProfile: () => api.get('/freelancers/me'),
+    updateProfile: (data: any) => api.put('/freelancers/profile', data),
+    createProfile: (data: any) => api.post('/freelancers/profile', data),
+    getOne: (id: string) => api.get(`/freelancers/${id}`),
+};
+
+// Skills API
+export const skillsAPI = {
+    getAll: (params?: any) => api.get('/freelancers/skills', { params }),
+};
+
+export const contractsAPI = {
+    create: (data: any) => api.post('/contracts', data),
+    getMyContracts: () => api.get('/contracts'),
+    getOne: (id: string) => api.get(`/contracts/${id}`),
+    addMilestone: (id: string, data: any) => api.post(`/contracts/${id}/milestones`, data),
+    updateMilestoneStatus: (contractId: string, milestoneId: string, status: string) =>
+        api.put(`/contracts/${contractId}/milestones/${milestoneId}`, { status }),
+};
+
 export default api;

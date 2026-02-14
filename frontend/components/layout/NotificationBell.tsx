@@ -51,8 +51,8 @@ export default function NotificationBell() {
     const fetchNotifications = async () => {
         try {
             const res = await api.get('/notifications?limit=5');
-            setNotifications(res.data.notifications);
-            setUnreadCount(res.data.unreadCount);
+            setNotifications(res.data.notifications || []);
+            setUnreadCount(res.data.unreadCount || 0);
         } catch (error) {
             console.error('Error fetching notifications');
         }

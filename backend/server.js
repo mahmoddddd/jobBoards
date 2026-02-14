@@ -19,7 +19,12 @@ const io = initSocket(server);
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://job-boards-front.vercel.app', process.env.FRONTEND_URL].filter(Boolean),
+  origin: [
+    'http://localhost:3000',
+    'https://job-boards-front.vercel.app',
+    'https://job-boarding-frontend.vercel.app',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(express.json());
@@ -44,6 +49,8 @@ app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/portfolio', require('./routes/portfolioRoutes'));
 app.use('/api/disputes', require('./routes/disputeRoutes'));
 app.use('/api/wallet', require('./routes/walletRoutes'));
+app.use('/api/skill-tests', require('./routes/skillTestRoutes'));
+app.use('/api/interviews', require('./routes/interviewRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

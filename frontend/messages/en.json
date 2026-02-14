@@ -714,7 +714,8 @@
             "browseProjects": "Browse Projects",
             "myProposals": "My Proposals",
             "myContracts": "My Contracts",
-            "messages": "Messages"
+            "messages": "Messages",
+            "verifySkills": "Verify Skills"
         },
         "status": {
             "PENDING": "Pending",
@@ -1005,6 +1006,60 @@
             "confirm": "Request Withdrawal",
             "processing": "Processing...",
             "insufficient": "Insufficient balance"
+        }
+    },
+    "ApplicationBoard": {
+        "title": "Application Board",
+        "pending": "Applied",
+        "reviewing": "Screening",
+        "interview": "Interview",
+        "offered": "Offer",
+        "accepted": "Hired",
+        "rejected": "Rejected",
+        "dragDrop": "Drag and drop to change status"
+    },
+    "Company": {
+        "applications": "Applications"
+    },
+    "SkillTests": {
+        "title": "Skill Verification",
+        "subtitle": "Prove your expertise and earn badges to display on your profile.",
+        "verified": "Verified Skill",
+        "minutes": "mins",
+        "questions": "questions",
+        "startTest": "Start Test",
+        "noTests": "No skill tests available",
+        "checkBackLater": "Please check back later for new tests.",
+        "submit": "Submit Test",
+        "next": "Next Question",
+        "prev": "Previous",
+        "confirmSubmit": "Are you sure you want to finish the test?",
+        "score": "Your Score: {score}%",
+        "passed": "Congratulations! You passed.",
+        "failed": "Unfortunately, you did not pass.",
+        "backToSkills": "Back to Skills"
+    },
+    "InterviewScheduler": {
+        "title": "Schedule Interview",
+        "schedulingFor": "Scheduling interview for:",
+        "date": "Date",
+        "time": "Time",
+        "type": "Interview Type",
+        "duration": "Duration",
+        "location": "Location",
+        "meetingLink": "Meeting Link",
+        "notes": "Notes",
+        "notesPlaceholder": "Add any special instructions...",
+        "locationPlaceholder": "e.g. Office 304, First Floor",
+        "successMessage": "Interview scheduled successfully",
+        "errorMessage": "Failed to schedule interview",
+        "confirm": "Confirm Schedule",
+        "cancel": "Cancel",
+        "min": "min",
+        "types": {
+            "video": "Video Call (Remote)",
+            "phone": "Phone Call",
+            "inPerson": "In Person"
         }
     }
 }

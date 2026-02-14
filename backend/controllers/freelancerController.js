@@ -92,9 +92,9 @@ exports.getMyProfile = async (req, res) => {
       .populate('userId', 'name email phone');
 
     if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: 'لا يوجد ملف مستقل مرتبط بحسابك'
+      return res.json({
+        success: true,
+        profile: null
       });
     }
 

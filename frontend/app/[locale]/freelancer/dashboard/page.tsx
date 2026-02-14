@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
+import api, { proposalsAPI, contractsAPI, freelancersAPI } from '@/lib/api';
 import {
     DollarSign,
     Briefcase,
@@ -106,18 +106,18 @@ export default function FreelancerDashboard() {
             setLoading(true);
 
             // Fetch proposals
-            const proposalsRes = await api.get('/proposals/my');
-            const proposals = proposalsRes.data.data || [];
+            const proposalsRes = await proposalsAPI.getMyProposals();
+            const proposals = proposalsRes.data.proposals || [];
 
             // Fetch contracts
-            const contractsRes = await api.get('/contracts/my');
-            const contracts = contractsRes.data.data || [];
+            const contractsRes = await contractsAPI.getMyContracts();
+            const contracts = contractsRes.data.contracts || [];
 
             // Fetch freelancer profile
             let profile = null;
             try {
-                const profileRes = await api.get('/freelancers/me');
-                profile = profileRes.data.data;
+                const profileRes = await freelancersAPI.getMyProfile();
+                profile = profileRes.data.profile;
             } catch (e) {
                 // Profile might not exist yet
             }
@@ -419,6 +419,16 @@ export default function FreelancerDashboard() {
                                 <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                             </div>
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">{t('quickActions.messages')}</span>
+                        </Link>
+                        <Link
+                            href="/freelancer/skills"
+                            className="flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:border-orange-200 dark:hover:border-orange-700 transition-all group"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                {/* Use Star or Award icon */}
+                                <Star className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                            </div>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">{t('quickActions.verifySkills')}</span>
                         </Link>
                     </div>
                 </div>

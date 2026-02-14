@@ -84,6 +84,8 @@ const getPasswordResetEmail = (name, resetUrl) => {
 const getApplicationStatusEmail = (name, jobTitle, companyName, status) => {
   const statusMap = {
     'REVIEWING': { label: 'قيد المراجعة', color: '#3b82f6', icon: '👀' },
+    'INTERVIEW': { label: 'مقابلة شخصية', color: '#8b5cf6', icon: '📅' },
+    'OFFERED': { label: 'عرض وظيفي', color: '#f59e0b', icon: '🤝' },
     'ACCEPTED': { label: 'مقبول', color: '#10b981', icon: '🎉' },
     'REJECTED': { label: 'مرفوض', color: '#ef4444', icon: '😔' },
   };
@@ -131,4 +133,56 @@ const getApplicationStatusEmail = (name, jobTitle, companyName, status) => {
   `;
 };
 
-module.exports = { sendEmail, getPasswordResetEmail, getApplicationStatusEmail };
+/**
+ * Interview invitation email template
+ */
+const getInterviewInvitationEmail = (name, jobTitle, companyName, date, time, type, location, notes) => {
+  return `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="ar">
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { font-family: 'Cairo', Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #8b5cf6, #a78bfa); padding: 30px; text-align: center; }
+        .header h1 { color: white; margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .details-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e5e7eb; }
+        .detail-row:last-child { border-bottom: none; }
+        .label { font-weight: bold; color: #4b5563; }
+        .value { color: #1f2937; }
+        .footer { padding: 20px; background: #f9fafb; text-align: center; color: #6b7280; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>📅 دعوة لمقابلة شخصية</h1>
+        </div>
+        <div class="content">
+          <p>مرحباً <strong>${name}</strong>،</p>
+          <p>يسر شركة <strong>${companyName}</strong> دعوتك لمقابلة بخصوص وظيفة <strong>${jobTitle}</strong>.</p>
+
+          <div class="details-box">
+            <p><strong>التاريخ:</strong> ${date}</p>
+            <p><strong>الوقت:</strong> ${time}</p>
+            <p><strong>النوع:</strong> ${type === 'VIDEO' ? 'عن بعد (فيديو)' : type === 'PHONE' ? 'هاتفية' : 'حضور شخصي'}</p>
+            <p><strong>الموقع/الرابط:</strong> ${location || 'سيتم إرسال التفاصيل لاحقاً'}</p>
+          </div>
+
+          ${notes ? `<p><strong>ملاحظات:</strong> ${notes}</p>` : ''}
+
+          <p>نتمنى لك التوفيق!</p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} JobBoard. جميع الحقوق محفوظة.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+module.exports = { sendEmail, getPasswordResetEmail, getApplicationStatusEmail, getInterviewInvitationEmail };

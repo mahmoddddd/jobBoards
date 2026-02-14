@@ -44,6 +44,10 @@ const freelancerProfileSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  verifiedSkills: [{
+    type: String,
+    unique: true
+  }],
   category: {
     type: String,
     required: [true, 'التصنيف مطلوب'],

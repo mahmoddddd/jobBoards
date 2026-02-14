@@ -738,7 +738,8 @@
             "browseProjects": "تصفح المشاريع",
             "myProposals": "عروضي",
             "myContracts": "عقودي",
-            "messages": "الرسائل"
+            "messages": "الرسائل",
+            "verifySkills": "توثيق المهارات"
         },
         "status": {
             "PENDING": "قيد المراجعة",
@@ -1030,6 +1031,60 @@
             "confirm": "طلب السحب",
             "processing": "جاري المعالجة...",
             "insufficient": "رصيد غير كافي"
+        }
+    },
+    "ApplicationBoard": {
+        "title": "لوحة المتقدمين",
+        "pending": "تم التقديم",
+        "reviewing": "قيد المراجعة",
+        "interview": "مقابلة",
+        "offered": "عرض وظيفي",
+        "accepted": "تم التعيين",
+        "rejected": "مرفوض",
+        "dragDrop": "اسحب وأفلت لتغيير الحالة"
+    },
+    "Company": {
+        "applications": "طلبات التوظيف"
+    },
+    "SkillTests": {
+        "title": "توثيق المهارات",
+        "subtitle": "أثبت خبرتك واحصل على شارات لتعرضها في ملفك الشخصي.",
+        "verified": "مهارة موثقة",
+        "minutes": "دقيقة",
+        "questions": "أسئلة",
+        "startTest": "ابدأ الاختبار",
+        "noTests": "لا توجد اختبارات متاحة حالياً",
+        "checkBackLater": "يرجى التحقق لاحقاً من الاختبارات الجديدة.",
+        "submit": "إنهاء الاختبار",
+        "next": "السؤال التالي",
+        "prev": "السابق",
+        "confirmSubmit": "هل أنت متأكد من إنهاء الاختبار؟",
+        "score": "نتيجتك: {score}%",
+        "passed": "تهانينا! لقد اجتزت الاختبار.",
+        "failed": "للأسف، لم تجتز الاختبار.",
+        "backToSkills": "العودة للمهارات"
+    },
+    "InterviewScheduler": {
+        "title": "تحديد موعد مقابلة",
+        "schedulingFor": "تحديد موعد لـ:",
+        "date": "التاريخ",
+        "time": "الوقت",
+        "type": "نوع المقابلة",
+        "duration": "المدة",
+        "location": "الموقع",
+        "meetingLink": "رابط الاجتماع",
+        "notes": "ملاحظات",
+        "notesPlaceholder": "أضف أي تعليمات خاصة...",
+        "locationPlaceholder": "مثال: المكتب 304، الطابق الأول",
+        "successMessage": "تم تحديد الموعد بنجاح",
+        "errorMessage": "فشل في تحديد الموعد",
+        "confirm": "تأكيد الموعد",
+        "cancel": "إلغاء",
+        "min": "دقيقة",
+        "types": {
+            "video": "مكالمة فيديو (عن بعد)",
+            "phone": "مكالمة هاتفية",
+            "inPerson": "حضور شخصي"
         }
     }
 }

@@ -4,18 +4,17 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { jobsAPI } from '@/lib/api';
-import { Loader2, ArrowLeft, ArrowRight, LayoutDashboard, List } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import ApplicationBoard from '@/components/company/ApplicationBoard';
 import { useLocale } from 'next-intl';
 
-export default function ApplicantsPage() {
+export default function JobApplicationsPage() {
     const params = useParams();
     const router = useRouter();
     const t = useTranslations('Company');
     const locale = useLocale();
     const isRtl = locale === 'ar';
-    const jobId = params.jobId as string;
+    const jobId = params.id as string;
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -46,7 +45,7 @@ export default function ApplicantsPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => router.back()}
@@ -56,21 +55,14 @@ export default function ApplicantsPage() {
                     </button>
                     <div>
                         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
-                            {job?.title}
+                            {job?.title} - {t('applications')}
                         </h1>
-                        {/* Breadcrumb style */}
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Link href="/company/dashboard" className="hover:text-primary-600">{t('title')}</Link>
-                            <span>/</span>
-                            <span>{t('applications')}</span>
-                        </div>
+                        <p className="text-gray-500 text-sm mt-1">Manage all applications in one board</p>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-4 min-h-[calc(100vh-200px)]">
-                <ApplicationBoard jobId={jobId} />
-            </div>
+            <ApplicationBoard jobId={jobId} />
         </div>
     );
 }
